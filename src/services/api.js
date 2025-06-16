@@ -3,13 +3,17 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:1616
 // Assets API
 export const assetsAPI = {
   getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/api/settings/assets/get`)
+    const response = await fetch(`${API_BASE_URL}/api/settings/assets/get`, {
+      credentials: "include",
+    })
     if (!response.ok) throw new Error("Failed to fetch assets")
     return response.json()
   },
 
   getById: async (id) => {
-    const response = await fetch(`${API_BASE_URL}/api/settings/assets/get/${id}`)
+    const response = await fetch(`${API_BASE_URL}/api/settings/assets/get/${id}`, {
+      credentials: "include",
+    })
     if (!response.ok) throw new Error("Failed to fetch asset")
     return response.json()
   },
@@ -20,6 +24,7 @@ export const assetsAPI = {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error("Failed to create asset")
@@ -32,6 +37,7 @@ export const assetsAPI = {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error("Failed to update asset")
@@ -41,6 +47,7 @@ export const assetsAPI = {
   delete: async (id) => {
     const response = await fetch(`${API_BASE_URL}/api/settings/assets/delete/${id}`, {
       method: "DELETE",
+      credentials: "include",
     })
     if (!response.ok) throw new Error("Failed to delete asset")
     return response.json()
@@ -50,13 +57,17 @@ export const assetsAPI = {
 // Bases API
 export const basesAPI = {
   getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/api/settings/bases/get`)
+    const response = await fetch(`${API_BASE_URL}/api/settings/bases/get`, {
+      credentials: "include",
+    })
     if (!response.ok) throw new Error("Failed to fetch bases")
     return response.json()
   },
 
   getById: async (id) => {
-    const response = await fetch(`${API_BASE_URL}/api/settings/bases/get/${id}`)
+    const response = await fetch(`${API_BASE_URL}/api/settings/bases/get/${id}`, {
+      credentials: "include",
+    })
     if (!response.ok) throw new Error("Failed to fetch base")
     return response.json()
   },
@@ -67,6 +78,7 @@ export const basesAPI = {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error("Failed to create base")
@@ -79,6 +91,7 @@ export const basesAPI = {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error("Failed to update base")
@@ -88,22 +101,27 @@ export const basesAPI = {
   delete: async (id) => {
     const response = await fetch(`${API_BASE_URL}/api/settings/bases/delete/${id}`, {
       method: "DELETE",
+      credentials: "include",
     })
     if (!response.ok) throw new Error("Failed to delete base")
     return response.json()
   },
 }
 
-// User Api
+// User API
 export const userAPI = {
   getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/api/auth/get`)
+    const response = await fetch(`${API_BASE_URL}/api/auth/get`, {
+      credentials: "include",
+    })
     if (!response.ok) throw new Error("Failed to fetch users")
     return response.json()
   },
 
   getById: async (id) => {
-    const response = await fetch(`${API_BASE_URL}/api/auth/get/${id}`)
+    const response = await fetch(`${API_BASE_URL}/api/auth/get/${id}`, {
+      credentials: "include",
+    })
     if (!response.ok) throw new Error("Failed to fetch user")
     return response.json()
   },
@@ -114,6 +132,7 @@ export const userAPI = {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error("Failed to create user")
@@ -126,6 +145,7 @@ export const userAPI = {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(data),
     })
     if (!response.ok) throw new Error("Failed to update user")
@@ -138,6 +158,7 @@ export const userAPI = {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(passwordData),
     })
     if (!response.ok) throw new Error("Failed to update password")
@@ -147,6 +168,7 @@ export const userAPI = {
   delete: async (id) => {
     const response = await fetch(`${API_BASE_URL}/api/auth/delete/${id}`, {
       method: "DELETE",
+      credentials: "include",
     })
     if (!response.ok) throw new Error("Failed to delete user")
     return response.json()

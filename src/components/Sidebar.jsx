@@ -29,7 +29,27 @@ import {
 import { MdAssignmentTurnedIn, MdOutlineAssignmentTurnedIn } from 'react-icons/md';
 import { FaUsers } from 'react-icons/fa6';
 
-export const Sidebar = ({pageTitle}) => {
+const getRoleColor = (role) => {
+  const colors = {
+    admin: "bg-red-100 text-red-800 border-red-200",
+    base_commander: "bg-blue-100 text-blue-800 border-blue-200",
+    logistics_officer: "bg-green-100 text-green-800 border-green-200",
+    user: "bg-gray-100 text-gray-800 border-gray-200",
+  }
+  return colors[role] || colors.user
+}
+
+const getRoleLabel = (role) => {
+  const labels = {
+    admin: "Admin",
+    base_commander: "Base Commander",
+    logistics_officer: "Logistics Officer",
+    user: "User",
+  }
+  return labels[role] || role
+}
+
+export const Sidebar = ({ pageTitle }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
 
@@ -235,8 +255,8 @@ export const Sidebar = ({pageTitle}) => {
               <div className="flex flex-col space-y-0.5">
                 <span className="text-sm font-medium line-clamp-1">{user?.name || 'Admin User'}</span>
                 <div className="flex items-center">
-                  <Badge variant="outline" className="h-5 px-1.5 text-xs">
-                    {user?.role || 'Administrator'}
+                  <Badge variant="outline" className={getRoleColor(user.role)}>
+                    {getRoleLabel(user?.role)}
                   </Badge>
                 </div>
               </div>

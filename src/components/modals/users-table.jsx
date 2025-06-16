@@ -1,5 +1,3 @@
-"use client"
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -10,8 +8,7 @@ const getRoleColor = (role) => {
   const colors = {
     admin: "bg-red-100 text-red-800 border-red-200",
     base_commander: "bg-blue-100 text-blue-800 border-blue-200",
-    operator: "bg-green-100 text-green-800 border-green-200",
-    analyst: "bg-purple-100 text-purple-800 border-purple-200",
+    logistics_officer: "bg-green-100 text-green-800 border-green-200",
     user: "bg-gray-100 text-gray-800 border-gray-200",
   }
   return colors[role] || colors.user
@@ -21,23 +18,13 @@ const getRoleLabel = (role) => {
   const labels = {
     admin: "Admin",
     base_commander: "Base Commander",
-    operator: "Operator",
-    analyst: "Analyst",
+    logistics_officer: "Logistics Officer",
     user: "User",
   }
   return labels[role] || role
 }
 
 export function UsersTable({ users, bases, onEdit, onDelete, loading }) {
-  const getBaseName = (baseId) => {
-    const base = bases.find((b) => (b.id || b._id) === baseId)
-    return base ? base.name : "Unknown Base"
-  }
-
-  const getBaseLocation = (baseId) => {
-    const base = bases.find((b) => (b.id || b._id) === baseId)
-    return base ? base.state : "Unknown Location"
-  }
 
   const getInitials = (name) => {
     return name
