@@ -14,48 +14,50 @@ import TransferPage from './pages/TransferPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import AssignmentPage from './pages/AssignmentPage.jsx';
 import { UnauthorizedPage } from './pages/UnauthorizedPage.jsx';
+import { AssetBaseProvider } from './context/AssetBaseContext.jsx';
 
 function App() {
   return (
     <>
       <ThemeProvider>
         <AuthProvider>
-          <Router>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
+          <AssetBaseProvider>
+            <Router>
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
 
-              <Route element={
-                <ProtectedRoute allowedRoles={['admin', 'base_commander', 'logistics_officer']}>
-                  <Layout />
-                </ProtectedRoute>}>
+                <Route element={
+                  <ProtectedRoute allowedRoles={['admin', 'base_commander', 'logistics_officer']}>
+                    <Layout />
+                  </ProtectedRoute>}>
 
-                <Route path="/" element={<DashboardPage />} />
-                <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                  <Route path="/" element={<DashboardPage />} />
+                  <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-                {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
-                <Route path="/purchase" element={<PurchasePage />} />
-                <Route path="/transfer" element={<TransferPage />} />
-                <Route path="/assignment" element={<AssignmentPage />} />
-                <Route path="/reports" element={<ReportsPage />} />
-               
-                <Route path="/profile" element={<ProfilePage />} />
-              </Route>
+                  <Route path="/purchase" element={<PurchasePage />} />
+                  <Route path="/transfer" element={<TransferPage />} />
+                  <Route path="/assignment" element={<AssignmentPage />} />
+                  <Route path="/reports" element={<ReportsPage />} />
 
-              <Route element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <Layout />
-                </ProtectedRoute>}>
+                  <Route path="/profile" element={<ProfilePage />} />
+                </Route>
 
-                <Route path="/users" element={<UsersPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-              </Route>
+                <Route element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <Layout />
+                  </ProtectedRoute>}>
+
+                  <Route path="/users" element={<UsersPage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                </Route>
 
 
-              {/* Catch-all route - redirect to home */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Router>
-          <Toaster position="top-right" />
+                {/* Catch-all route - redirect to home */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Router>
+            <Toaster position="top-right" />
+          </AssetBaseProvider>
         </AuthProvider>
       </ThemeProvider>
     </>
