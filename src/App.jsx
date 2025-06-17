@@ -15,6 +15,7 @@ import ReportsPage from './pages/ReportsPage.jsx';
 import AssignmentPage from './pages/AssignmentPage.jsx';
 import { UnauthorizedPage } from './pages/UnauthorizedPage.jsx';
 import { AssetBaseProvider } from './context/AssetBaseContext.jsx';
+import StocksPage from './pages/StocksPage.jsx';
 
 function App() {
   return (
@@ -30,15 +31,10 @@ function App() {
                   <ProtectedRoute allowedRoles={['admin', 'base_commander', 'logistics_officer']}>
                     <Layout />
                   </ProtectedRoute>}>
-
                   <Route path="/" element={<DashboardPage />} />
                   <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-                  <Route path="/purchase" element={<PurchasePage />} />
-                  <Route path="/transfer" element={<TransferPage />} />
-                  <Route path="/assignment" element={<AssignmentPage />} />
+                  <Route path="/stocks" element={<StocksPage />} />
                   <Route path="/reports" element={<ReportsPage />} />
-
                   <Route path="/profile" element={<ProfilePage />} />
                 </Route>
 
@@ -46,9 +42,23 @@ function App() {
                   <ProtectedRoute allowedRoles={['admin']}>
                     <Layout />
                   </ProtectedRoute>}>
-
                   <Route path="/users" element={<UsersPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
+                </Route>
+
+                <Route element={
+                  <ProtectedRoute allowedRoles={['admin', 'base_commander']}>
+                    <Layout />
+                  </ProtectedRoute>}>
+                  <Route path="/assignment" element={<AssignmentPage />} />
+                </Route>
+
+                <Route element={
+                  <ProtectedRoute allowedRoles={['admin', 'logistics_officer']}>
+                    <Layout />
+                  </ProtectedRoute>}>
+                  <Route path="/purchase" element={<PurchasePage />} />
+                  <Route path="/transfer" element={<TransferPage />} />
                 </Route>
 
 

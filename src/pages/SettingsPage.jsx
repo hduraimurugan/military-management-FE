@@ -34,8 +34,6 @@ export const SettingsPage = () => {
   bases,
   loading,
   fetchData,
-  setAssets,
-  setBases
 } = useAssetBase()
 
   console.log("Assets", assets);
@@ -60,10 +58,16 @@ export const SettingsPage = () => {
     data: null,
   })
 
-  // Fetch data on component mount
-  useEffect(() => {
-    fetchData()
-  }, [])
+  // Fetch data on component mount only if data doesn't exist
+ useEffect(() => {
+  if (
+    (!assets || assets.length === 0) &&
+    (!bases || bases.length === 0)
+  ) {
+    fetchData();
+  }
+}, [assets, bases]);
+
 
 
   // Asset handlers

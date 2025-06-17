@@ -26,7 +26,7 @@ import {
   HelpCircle,
   ChevronRight
 } from 'lucide-react';
-import { MdAssignmentTurnedIn, MdOutlineAssignmentTurnedIn } from 'react-icons/md';
+import { MdAssignmentTurnedIn, MdOutlineAssignmentTurnedIn, MdOutlineInventory2 } from 'react-icons/md';
 import { FaUsers } from 'react-icons/fa6';
 
 const getRoleColor = (role) => {
@@ -51,6 +51,7 @@ const getRoleLabel = (role) => {
 
 export const Sidebar = ({ pageTitle }) => {
   const { user, logout } = useAuth();
+  const role = user?.role;
   const location = useLocation();
 
   // Check if the current path matches the link path
@@ -62,68 +63,61 @@ export const Sidebar = ({ pageTitle }) => {
       name: 'Dashboard',
       path: '/',
       icon: <LayoutDashboard className="h-5 w-5" />,
+      roles: ['admin', 'base_commander', 'logistics_officer']
+    },
+    {
+      name: 'Stocks & Inventory',
+      path: '/stocks',
+      icon: <MdOutlineInventory2 className="h-5 w-5" />,
+      roles: ['admin', 'base_commander', 'logistics_officer']
     },
     {
       name: 'Purchases Page',
       path: '/purchase',
       icon: <BiPurchaseTag className="h-5 w-5" />,
+      roles: ['admin', 'logistics_officer']
     },
     {
       name: 'Transfer Page',
       path: '/transfer',
       icon: <ArrowRightLeft className="h-5 w-5" />,
+      roles: ['admin', 'logistics_officer']
     },
     {
       name: 'Assignments Page',
       path: '/assignment',
       icon: <MdOutlineAssignmentTurnedIn className="h-5 w-5" />,
+      roles: ['admin', 'base_commander']
     },
     {
       name: 'Reports',
       path: '/reports',
-      icon: <FileText className="h-5 w-5" />
+      icon: <FileText className="h-5 w-5" />,
+      roles: ['admin', 'base_commander', 'logistics_officer']
     }
   ];
-
-  // const communicationItems = [
-  //   {
-  //     name: 'Messages',
-  //     path: '/messages',
-  //     icon: <MessageSquare className="h-5 w-5" />,
-  //     badge: 'New',
-  //     badgeVariant: 'default'
-  //   },
-  //   {
-  //     name: 'Inbox',
-  //     path: '/inbox',
-  //     icon: <Inbox className="h-5 w-5" />,
-  //     badge: '3',
-  //     badgeVariant: 'outline'
-  //   },
-  //   {
-  //     name: 'Calendar',
-  //     path: '/calendar',
-  //     icon: <Calendar className="h-5 w-5" />,
-  //   }
-  // ];
 
   const accountItems = [
     {
       name: 'Profile',
       path: '/profile',
       icon: <User className="h-5 w-5" />,
+      roles: ['admin', 'base_commander', 'logistics_officer']
     },
     {
       name: 'Users Page',
       path: '/users',
       icon: <FaUsers className="h-5 w-5" />,
+      roles: ['admin']
     },
     {
       name: 'Settings',
       path: '/settings',
       icon: <Settings className="h-5 w-5" />,
+      roles: ['admin']
     }
   ];
+
 
   // NavItem component for consistent styling of each navigation item
   const NavItem = ({ item }) => (
@@ -188,26 +182,13 @@ export const Sidebar = ({ pageTitle }) => {
               </h3>
             </div>
             <div className="space-y-1">
-              {mainNavigation.map((item) => (
-                <NavItem key={item.path} item={item} />
-              ))}
+              {mainNavigation
+                .filter(item => item.roles.includes(role))
+                .map(item => (
+                  <NavItem key={item.path} item={item} />
+                ))}
             </div>
           </div>
-
-          {/* Hidden for now */}
-          {/* Communication Section */}
-          {/* <div className="py-2">
-            <div className="flex items-center justify-between px-1 py-1.5">
-              <h3 className="text-xs font-medium uppercase text-muted-foreground tracking-wider">
-                Communication
-              </h3>
-            </div>
-            <div className="space-y-1">
-              {communicationItems?.map((item) => (
-                <NavItem key={item.path} item={item} />
-              ))}
-            </div>
-          </div> */}
 
           {/* Account Section */}
           <div className="py-2">
@@ -217,9 +198,11 @@ export const Sidebar = ({ pageTitle }) => {
               </h3>
             </div>
             <div className="space-y-1">
-              {accountItems.map((item) => (
-                <NavItem key={item.path} item={item} />
-              ))}
+              {accountItems
+                .filter(item => item.roles.includes(role))
+                .map(item => (
+                  <NavItem key={item.path} item={item} />
+                ))}
             </div>
           </div>
         </ScrollArea>
