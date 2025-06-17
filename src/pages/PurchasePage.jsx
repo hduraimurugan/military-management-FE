@@ -47,6 +47,7 @@ const PurchasePage = () => {
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedAssetFilter, setSelectedAssetFilter] = useState("")
+  const [selectedBaseFilter, setSelectedBaseFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("")
 
   // Form state
@@ -63,7 +64,7 @@ const PurchasePage = () => {
     total: 0,
     pages: 1,
   });
-  const [selectedBaseFilter, setSelectedBaseFilter] = useState("");
+
 
   const fetchPurchases = async () => {
     try {
@@ -262,6 +263,7 @@ const PurchasePage = () => {
                 className="pl-10"
               />
             </div>
+
             <Select value={selectedAssetFilter} onValueChange={setSelectedAssetFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Filter by asset" />
@@ -290,7 +292,15 @@ const PurchasePage = () => {
                   <SelectValue placeholder="Filter by base" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All bases</SelectItem>
+                  {/* Option 1: Remove the "All bases" option */}
+                  {bases.map((base) => (
+                    <SelectItem key={base._id} value={base._id}>
+                      {base.name}
+                    </SelectItem>
+                  ))}
+
+                  {/* OR Option 2: Use a special value like empty string or "all" */}
+                  <SelectItem value="all">All bases</SelectItem>
                   {bases.map((base) => (
                     <SelectItem key={base._id} value={base._id}>
                       {base.name}
@@ -513,6 +523,29 @@ const PurchasePage = () => {
               />
             </div>
 
+            {/* Add this section for base selection (admin only) */}
+            {user?.role === "admin" && (
+              <div className="space-y-2">
+                <Label htmlFor="base">Base</Label>
+                <Select
+                  value={formData?.base || ""}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, base: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select base" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All bases</SelectItem>
+                    {bases.map((base) => (
+                      <SelectItem key={base._id} value={base._id}>
+                        {base.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <Label>Items</Label>
@@ -618,6 +651,29 @@ const PurchasePage = () => {
                 rows={3}
               />
             </div>
+
+            {/* Add this section for base selection (admin only) */}
+            {user?.role === "admin" && (
+              <div className="space-y-2">
+                <Label htmlFor="editBase">Base</Label>
+                <Select
+                  value={formData.base || ""}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, base: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select base" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All bases</SelectItem>
+                    {bases.map((base) => (
+                      <SelectItem key={base._id} value={base._id}>
+                        {base.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="space-y-3">
               <div className="flex justify-between items-center">
