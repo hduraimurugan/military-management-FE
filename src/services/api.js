@@ -174,3 +174,63 @@ export const userAPI = {
     return response.json()
   },
 }
+
+// Purchases API
+export const purchasesAPI = {
+  // 📦 Create a new purchase bill
+  create: async (data) => {
+    const response = await fetch(`${API_BASE_URL}/api/purchase/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Failed to create purchase bill");
+    return response.json();
+  },
+
+  // ✏️ Update a purchase bill by ID
+  update: async (id, data) => {
+    const response = await fetch(`${API_BASE_URL}/api/purchase/update/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Failed to update purchase bill");
+    return response.json();
+  },
+
+  // ❌ Delete a purchase bill by ID
+  delete: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/api/purchase/delete/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error("Failed to delete purchase bill");
+    return response.json();
+  },
+
+  // 📃 Get all purchase bills with pagination and filters
+  getAll: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/api/purchase/getMy?${query}`, {
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error("Failed to fetch purchase bills");
+    return response.json();
+  },
+
+  // 🔍 Get single purchase bill by ID
+  getById: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/api/purchase/get/${id}`, {
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error("Failed to fetch purchase bill");
+    return response.json();
+  },
+};
