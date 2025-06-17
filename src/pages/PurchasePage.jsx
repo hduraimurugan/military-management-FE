@@ -270,11 +270,11 @@ const PurchasePage = () => {
               </SelectTrigger>
               <SelectContent>
                 {/* Option 1: Remove the "All assets" option */}
-                {assets.map((asset) => (
+                {/* {assets.map((asset) => (
                   <SelectItem key={asset._id} value={asset._id}>
                     {asset.name}
                   </SelectItem>
-                ))}
+                ))} */}
 
                 {/* OR Option 2: Use a special value like "all" */}
                 <SelectItem value="all">All assets</SelectItem>
@@ -293,11 +293,11 @@ const PurchasePage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {/* Option 1: Remove the "All bases" option */}
-                  {bases.map((base) => (
+                  {/* {bases.map((base) => (
                     <SelectItem key={base._id} value={base._id}>
                       {base.name}
                     </SelectItem>
-                  ))}
+                  ))} */}
 
                   {/* OR Option 2: Use a special value like empty string or "all" */}
                   <SelectItem value="all">All bases</SelectItem>

@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { MdInventory } from 'react-icons/md';
+import { getRoleColor, getRoleLabel } from '../utils/roleColorLabel';
 
 export const Layout = () => {
   const { user, logout } = useAuth();
@@ -96,11 +97,11 @@ export const Layout = () => {
               </SheetContent>
             </Sheet>
 
-             {/* App logo/title for mobile */}
+            {/* App logo/title for mobile */}
             <Link to="/" className="flex items-center gap-2 lg:hidden">
               <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-                  <FaPersonMilitaryRifle className="h-5 w-5 text-primary-foreground" />
-                </div>
+                <FaPersonMilitaryRifle className="h-5 w-5 text-primary-foreground" />
+              </div>
               <span className="font-semibold text-lg hidden sm:inline-block">Military Base Managemen</span>
             </Link>
 
@@ -207,7 +208,7 @@ export const Layout = () => {
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                   <Avatar className="h-9 w-9">
                     <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
-                      A
+                      {user?.name?.charAt(0) || 'A'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -224,7 +225,9 @@ export const Layout = () => {
                   <Link to="/profile" className="flex cursor-pointer items-center gap-2">
                     <User className="h-4 w-4" />
                     Profile
-                    <Badge className="ml-auto" variant="outline">Admin</Badge>
+                    <Badge variant="outline" className={`${getRoleColor(user.role)} ml-auto`}>
+                      {getRoleLabel(user?.role)}
+                    </Badge>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -274,7 +277,7 @@ export const Layout = () => {
         {/* Sidebar - Hidden on mobile */}
         <aside className="hidden h-full border-r bg-background lg:block lg:w-64 lg:flex-shrink-0">
           <ScrollArea className="h-full">
-            <Sidebar  pageTitle={pageTitle}/>
+            <Sidebar pageTitle={pageTitle} />
           </ScrollArea>
         </aside>
 
