@@ -336,7 +336,7 @@ const PurchasePage = () => {
 
       {/* Table */}
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="px-2">
           <Table>
             <TableHeader>
               <TableRow>
