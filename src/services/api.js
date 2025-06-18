@@ -279,8 +279,14 @@ export const transfersAPI = {
       credentials: "include",
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error("Failed to create transfer bill");
-    return response.json();
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to create transfer bill";
+      throw new Error(errorMessage);
+    }
+    return result;
   },
 
   // ❌ Delete a transfer bill by ID
@@ -289,9 +295,17 @@ export const transfersAPI = {
       method: "DELETE",
       credentials: "include",
     });
-    if (!response.ok) throw new Error("Failed to delete transfer bill");
-    return response.json();
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to delete transfer bill";
+      throw new Error(errorMessage);
+    }
+
+    return result;
   },
+
 
   // 📃 Get all transfer bills (for user's base or all depending on role)
   getAll: async (params = {}) => {
