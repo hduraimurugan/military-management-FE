@@ -67,7 +67,7 @@ export const Layout = () => {
     else if (path.includes('transfer')) setPageTitle('Transfers');
     else if (path.includes('assignment')) setPageTitle('Assignments');
     else if (path.includes('expend')) setPageTitle('Expends');
-    else if (path.includes('reports')) setPageTitle('Reports');
+    else if (path.includes('reports')) setPageTitle('Movement Logs');
     else if (path.includes('stocks')) setPageTitle('Stocks & Inventory');
     else setPageTitle('Dashboard');
   }, [location.pathname]);

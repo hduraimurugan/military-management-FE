@@ -78,10 +78,10 @@ export const Sidebar = ({ pageTitle }) => {
       roles: ['admin', 'base_commander']
     },
     {
-      name: 'Reports',
+      name: 'Movement Logs',
       path: '/reports',
       icon: <FileText className="h-5 w-5" />,
-      roles: ['admin', 'base_commander', 'logistics_officer']
+      roles: ['admin']
     }
   ];
 

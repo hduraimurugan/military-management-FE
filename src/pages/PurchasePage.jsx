@@ -170,7 +170,7 @@ const PurchasePage = () => {
       setSelectedPurchase(null)
       fetchPurchases()
     } catch (err) {
-      setError(err.message)
+      toast(err.message, "destructive");
     }
   }
 
@@ -257,8 +257,9 @@ const PurchasePage = () => {
         </div>
 
         <div className="flex gap-2 items-center">
-          <Button asChild variant='secondary'>
+          <Button variant="outline" asChild>
             <Link to="/stocks">
+              <Package className="mr-2 h-4 w-4" />
               View Stocks
             </Link>
           </Button>

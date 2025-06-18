@@ -229,8 +229,16 @@ export const purchasesAPI = {
       method: "DELETE",
       credentials: "include",
     });
-    if (!response.ok) throw new Error("Failed to delete purchase bill");
-    return response.json();
+    // if (!response.ok) throw new Error("Failed to delete purchase bill");
+    // return response.json();
+     const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to delete purchase bill";
+      throw new Error(errorMessage);
+    }
+
+    return result;
   },
 
   // 📃 Get all purchase bills with pagination and filters

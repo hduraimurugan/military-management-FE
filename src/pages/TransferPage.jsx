@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import {
   Plus,
@@ -12,13 +14,16 @@ import {
   X,
   ArrowRight,
   ArrowLeft,
+  ChevronDown,
+  Package,
+  PackageIcon,
 } from "lucide-react"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { inventoryAPI, transfersAPI } from "../services/api.js"
 import { useAssetBase } from "../context/AssetBaseContext"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -44,6 +49,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Separator } from "@/components/ui/separator"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 import { useAuth } from "../context/AuthContext"
 import { toast } from "sonner"
 import { Link } from "react-router-dom"
@@ -85,7 +93,7 @@ const TransferPage = () => {
     invoiceNumber: "",
     remarks: "",
     transferDate: new Date().toISOString().split("T")[0],
-    fromBase: ""
+    fromBase: "",
   })
 
   const fetchTransfers = async () => {
@@ -142,9 +150,6 @@ const TransferPage = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        // const params = {
-        //   base_id: baseId
-        // }
         const data = await inventoryAPI.getMyStock()
         setInventoryData(data.stocks || [])
       } catch (err) {
@@ -176,8 +181,7 @@ const TransferPage = () => {
       resetForm()
       fetchTransfers()
     } catch (err) {
-      // setError(err.message)
-      toast(err.message, "destructive");
+      toast(err.message, "destructive")
     }
   }
 
@@ -189,7 +193,7 @@ const TransferPage = () => {
       fetchTransfers()
     } catch (err) {
       setError(err.message)
-      toast(err.message, "destructive");
+      toast(err.message, "destructive")
     }
   }
 
@@ -277,8 +281,9 @@ const TransferPage = () => {
         </div>
 
         <div className="flex gap-2 items-center">
-          <Button asChild variant='secondary'>
+          <Button variant="outline" asChild>
             <Link to="/stocks">
+              <Package className="mr-2 h-4 w-4" />
               View Stocks
             </Link>
           </Button>
@@ -312,83 +317,237 @@ const TransferPage = () => {
         </TabsList>
 
         <TabsContent value="out" className="space-y-6">
-          {/* Search and Filters */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Search & Filters - Outgoing Transfers
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search transfers..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+          {/* Compact Filters for Transfer Out */}
+          <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2">
+                  <Filter className="h-5 w-5" />
+                  Search & Filters - Outgoing
+                </CardTitle>
+                {(searchTerm ||
+                  (selectedAssetFilter && selectedAssetFilter !== "all") ||
+                  (selectedBaseFilter && selectedBaseFilter !== "all") ||
+                  dateFilter) && (
+                    <Badge variant="secondary" className="text-xs">
+                      {
+                        [
+                          searchTerm,
+                          selectedAssetFilter && selectedAssetFilter !== "all",
+                          selectedBaseFilter && selectedBaseFilter !== "all",
+                          dateFilter,
+                        ].filter(Boolean).length
+                      }{" "}
+                      active
+                    </Badge>
+                  )}
+              </div>
 
-                <Select value={selectedAssetFilter} onValueChange={setSelectedAssetFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filter by asset" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All assets</SelectItem>
+              {(searchTerm ||
+                (selectedAssetFilter && selectedAssetFilter !== "all") ||
+                (selectedBaseFilter && selectedBaseFilter !== "all") ||
+                dateFilter) && (
+                  <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2">
+                    <X className="h-3 w-3 mr-1" />
+                    Clear
+                  </Button>
+                )}
+            </div>
+
+            {/* Compact Filter Controls */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Search */}
+              <div className="relative min-w-[200px] flex-1 max-w-xs">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Search transfers..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
+                />
+              </div>
+
+              <Separator orientation="vertical" className="h-6" />
+
+              {/* Asset Filter */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-9">
+                    <Package className="h-3 w-3 mr-2" />
+                    {selectedAssetFilter && selectedAssetFilter !== "all"
+                      ? getAssetById(selectedAssetFilter)?.name
+                      : "Asset"}
+                    <ChevronDown className="h-3 w-3 ml-2" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-2" align="start">
+                  <div className="space-y-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        (!selectedAssetFilter || selectedAssetFilter === "all") && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setSelectedAssetFilter("all")}
+                    >
+                      All assets
+                    </Button>
                     {assets.map((asset) => (
-                      <SelectItem key={asset._id} value={asset._id}>
+                      <Button
+                        key={asset._id}
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "w-full justify-start h-8 text-sm",
+                          selectedAssetFilter === asset._id && "bg-primary/10 text-primary",
+                        )}
+                        onClick={() => setSelectedAssetFilter(asset._id)}
+                      >
                         {asset.name}
-                      </SelectItem>
+                      </Button>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-                {isAdmin &&
-                  <Select value={baseId} onValueChange={setBaseId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Filter by source" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All sources</SelectItem>
+              {/* Source Base Filter (Admin Only) */}
+              {isAdmin && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-9">
+                      <MapPin className="h-3 w-3 mr-2" />
+                      {baseId && baseId !== "all" ? bases.find((b) => b._id === baseId)?.name : "Source"}
+                      <ChevronDown className="h-3 w-3 ml-2" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-48 p-2" align="start">
+                    <div className="space-y-1">
+                      {/* <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "w-full justify-start h-8 text-sm",
+                          (!baseId || baseId === "all") && "bg-primary/10 text-primary",
+                        )}
+                        onClick={() => setBaseId("all")}
+                      >
+                        All sources
+                      </Button> */}
                       {bases.map((base) => (
-                        <SelectItem key={base._id} value={base._id}>
+                        <Button
+                          key={base._id}
+                          variant="ghost"
+                          size="sm"
+                          className={cn(
+                            "w-full justify-start h-8 text-sm",
+                            baseId === base._id && "bg-primary/10 text-primary",
+                          )}
+                          onClick={() => setBaseId(base._id)}
+                        >
                           {base.name}
-                        </SelectItem>
+                        </Button>
                       ))}
-                    </SelectContent>
-                  </Select>}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
 
-                <Select value={selectedBaseFilter} onValueChange={setSelectedBaseFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filter by destination" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All destinations</SelectItem>
+              {/* Destination Base Filter */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-9">
+                    <ArrowRight className="h-3 w-3 mr-2" />
+                    {selectedBaseFilter && selectedBaseFilter !== "all"
+                      ? bases.find((b) => b._id === selectedBaseFilter)?.name
+                      : "Destination"}
+                    <ChevronDown className="h-3 w-3 ml-2" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-2" align="start">
+                  <div className="space-y-1">
+                    {/* <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        (!selectedBaseFilter || selectedBaseFilter === "all") && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setSelectedBaseFilter("all")}
+                    >
+                      All destinations
+                    </Button> */}
                     {bases.map((base) => (
-                      <SelectItem key={base._id} value={base._id}>
+                      <Button
+                        key={base._id}
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "w-full justify-start h-8 text-sm",
+                          selectedBaseFilter === base._id && "bg-primary/10 text-primary",
+                        )}
+                        onClick={() => setSelectedBaseFilter(base._id)}
+                      >
                         {base.name}
-                      </SelectItem>
+                      </Button>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
+              {/* Date Filter */}
+              <div className="flex items-center gap-1">
                 <Input
                   type="date"
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  placeholder="Filter by date"
+                  className={cn("h-9 w-auto", dateFilter && "border-primary/50 bg-primary/5")}
                 />
               </div>
-              <div className="mt-4 flex items-center gap-2">
-                <Button variant="outline" onClick={clearFilters} className="flex items-center gap-2">
-                  <X className="h-4 w-4" />
-                  Clear Filters
-                </Button>
-              </div>
-            </CardContent>
+
+              <Separator orientation="vertical" className="h-6" />
+            </div>
+
+            {/* Active Filters Display */}
+            {(searchTerm ||
+              (selectedAssetFilter && selectedAssetFilter !== "all") ||
+              (selectedBaseFilter && selectedBaseFilter !== "all") ||
+              dateFilter) && (
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+                  <span className="text-xs text-primary/50 font-medium">Active filters:</span>
+                  {searchTerm && (
+                    <Badge variant="secondary" className="text-xs">
+                      Search: {searchTerm}
+                      <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
+                    </Badge>
+                  )}
+                  {selectedAssetFilter && selectedAssetFilter !== "all" && (
+                    <Badge variant="secondary" className="text-xs">
+                      {getAssetById(selectedAssetFilter)?.name}
+                      <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedAssetFilter("all")} />
+                    </Badge>
+                  )}
+                  {selectedBaseFilter && selectedBaseFilter !== "all" && (
+                    <Badge variant="secondary" className="text-xs">
+                      To: {bases.find((b) => b._id === selectedBaseFilter)?.name}
+                      <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedBaseFilter("all")} />
+                    </Badge>
+                  )}
+                  {isAdmin && baseId && baseId !== "all" && (
+                    <Badge variant="secondary" className="text-xs">
+                      From: {bases.find((b) => b._id === baseId)?.name}
+                      <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setBaseId("all")} />
+                    </Badge>
+                  )}
+                  {dateFilter && (
+                    <Badge variant="secondary" className="text-xs">
+                      Date: {formatDate(dateFilter)}
+                      <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setDateFilter("")} />
+                    </Badge>
+                  )}
+                </div>
+              )}
           </Card>
 
           {/* Transfer Out Table */}
@@ -463,6 +622,13 @@ const TransferPage = () => {
                       ? "Get started by creating your first transfer."
                       : "Try adjusting your search or filter criteria."}
                   </p>
+
+                  {(isAdmin || isLogisticsOfficer) && filteredTransfers.length === 0 && (
+                    <Button onClick={() => setShowCreateModal(true)} className="mt-3">
+                      <Plus className="h-4 w-4" />
+                      Create Transfer
+                    </Button>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -470,83 +636,237 @@ const TransferPage = () => {
         </TabsContent>
 
         <TabsContent value="in" className="space-y-6">
-          {/* Search and Filters for Transfer In */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Search & Filters - Incoming Transfers
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search transfers..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+          {/* Compact Filters for Transfer In */}
+          <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2">
+                  <Filter className="h-5 w-5" />
+                  Search & Filters - Incoming
+                </CardTitle>
+                {(searchTerm ||
+                  (selectedAssetFilter && selectedAssetFilter !== "all") ||
+                  (selectedBaseFilter && selectedBaseFilter !== "all") ||
+                  dateFilter) && (
+                    <Badge variant="secondary" className="text-xs">
+                      {
+                        [
+                          searchTerm,
+                          selectedAssetFilter && selectedAssetFilter !== "all",
+                          selectedBaseFilter && selectedBaseFilter !== "all",
+                          dateFilter,
+                        ].filter(Boolean).length
+                      }{" "}
+                      active
+                    </Badge>
+                  )}
+              </div>
 
-                <Select value={selectedAssetFilter} onValueChange={setSelectedAssetFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filter by asset" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All assets</SelectItem>
+              {(searchTerm ||
+                (selectedAssetFilter && selectedAssetFilter !== "all") ||
+                (selectedBaseFilter && selectedBaseFilter !== "all") ||
+                dateFilter) && (
+                  <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2">
+                    <X className="h-3 w-3 mr-1" />
+                    Clear
+                  </Button>
+                )}
+            </div>
+
+            {/* Compact Filter Controls */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Search */}
+              <div className="relative min-w-[200px] flex-1 max-w-xs">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Search transfers..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
+                />
+              </div>
+
+              <Separator orientation="vertical" className="h-6" />
+
+              {/* Asset Filter */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-9">
+                    <Package className="h-3 w-3 mr-2" />
+                    {selectedAssetFilter && selectedAssetFilter !== "all"
+                      ? getAssetById(selectedAssetFilter)?.name
+                      : "Asset"}
+                    <ChevronDown className="h-3 w-3 ml-2" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-2" align="start">
+                  <div className="space-y-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        (!selectedAssetFilter || selectedAssetFilter === "all") && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setSelectedAssetFilter("all")}
+                    >
+                      All assets
+                    </Button>
                     {assets.map((asset) => (
-                      <SelectItem key={asset._id} value={asset._id}>
+                      <Button
+                        key={asset._id}
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "w-full justify-start h-8 text-sm",
+                          selectedAssetFilter === asset._id && "bg-primary/10 text-primary",
+                        )}
+                        onClick={() => setSelectedAssetFilter(asset._id)}
+                      >
                         {asset.name}
-                      </SelectItem>
+                      </Button>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-                <Select value={selectedBaseFilter} onValueChange={setSelectedBaseFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filter by source" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All sources</SelectItem>
+              {/* Source Base Filter */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-9">
+                    <ArrowLeft className="h-3 w-3 mr-2" />
+                    {selectedBaseFilter && selectedBaseFilter !== "all"
+                      ? bases.find((b) => b._id === selectedBaseFilter)?.name
+                      : "Source"}
+                    <ChevronDown className="h-3 w-3 ml-2" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-2" align="start">
+                  <div className="space-y-1">
+                    {/* <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        (!selectedBaseFilter || selectedBaseFilter === "all") && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setSelectedBaseFilter("all")}
+                    >
+                      All sources
+                    </Button> */}
                     {bases.map((base) => (
-                      <SelectItem key={base._id} value={base._id}>
+                      <Button
+                        key={base._id}
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "w-full justify-start h-8 text-sm",
+                          selectedBaseFilter === base._id && "bg-primary/10 text-primary",
+                        )}
+                        onClick={() => setSelectedBaseFilter(base._id)}
+                      >
                         {base.name}
-                      </SelectItem>
+                      </Button>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-                {isAdmin &&
-                  <Select value={baseId} onValueChange={setBaseId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Filter by destination" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All destinations</SelectItem>
+              {/* Destination Base Filter (Admin Only) */}
+              {isAdmin && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-9">
+                      <MapPin className="h-3 w-3 mr-2" />
+                      {baseId && baseId !== "all" ? bases.find((b) => b._id === baseId)?.name : "Destination"}
+                      <ChevronDown className="h-3 w-3 ml-2" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-48 p-2" align="start">
+                    <div className="space-y-1">
+                      {/* <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "w-full justify-start h-8 text-sm",
+                          (!baseId || baseId === "all") && "bg-primary/10 text-primary",
+                        )}
+                        onClick={() => setBaseId("all")}
+                      >
+                        All destinations
+                      </Button> */}
                       {bases.map((base) => (
-                        <SelectItem key={base._id} value={base._id}>
+                        <Button
+                          key={base._id}
+                          variant="ghost"
+                          size="sm"
+                          className={cn(
+                            "w-full justify-start h-8 text-sm",
+                            baseId === base._id && "bg-primary/10 text-primary",
+                          )}
+                          onClick={() => setBaseId(base._id)}
+                        >
                           {base.name}
-                        </SelectItem>
+                        </Button>
                       ))}
-                    </SelectContent>
-                  </Select>}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
 
+              {/* Date Filter */}
+              <div className="flex items-center gap-1">
                 <Input
                   type="date"
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  placeholder="Filter by date"
+                  className={cn("h-9 w-auto", dateFilter && "border-primary/50 bg-primary/5")}
                 />
               </div>
-              <div className="mt-4 flex items-center gap-2">
-                <Button variant="outline" onClick={clearFilters} className="flex items-center gap-2">
-                  <X className="h-4 w-4" />
-                  Clear Filters
-                </Button>
-              </div>
-            </CardContent>
+
+              <Separator orientation="vertical" className="h-6" />
+            </div>
+
+            {/* Active Filters Display */}
+            {(searchTerm ||
+              (selectedAssetFilter && selectedAssetFilter !== "all") ||
+              (selectedBaseFilter && selectedBaseFilter !== "all") ||
+              dateFilter) && (
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+                  <span className="text-xs text-primary/50 font-medium">Active filters:</span>
+                  {searchTerm && (
+                    <Badge variant="secondary" className="text-xs">
+                      Search: {searchTerm}
+                      <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
+                    </Badge>
+                  )}
+                  {selectedAssetFilter && selectedAssetFilter !== "all" && (
+                    <Badge variant="secondary" className="text-xs">
+                      {getAssetById(selectedAssetFilter)?.name}
+                      <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedAssetFilter("all")} />
+                    </Badge>
+                  )}
+                  {selectedBaseFilter && selectedBaseFilter !== "all" && (
+                    <Badge variant="secondary" className="text-xs">
+                      From: {bases.find((b) => b._id === selectedBaseFilter)?.name}
+                      <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedBaseFilter("all")} />
+                    </Badge>
+                  )}
+                  {isAdmin && baseId && baseId !== "all" && (
+                    <Badge variant="secondary" className="text-xs">
+                      To: {bases.find((b) => b._id === baseId)?.name}
+                      <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setBaseId("all")} />
+                    </Badge>
+                  )}
+                  {dateFilter && (
+                    <Badge variant="secondary" className="text-xs">
+                      Date: {formatDate(dateFilter)}
+                      <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setDateFilter("")} />
+                    </Badge>
+                  )}
+                </div>
+              )}
           </Card>
 
           {/* Transfer In Table */}
@@ -618,6 +938,13 @@ const TransferPage = () => {
                       ? "No transfers have been received yet."
                       : "Try adjusting your search or filter criteria."}
                   </p>
+
+                   {(isAdmin || isLogisticsOfficer) && filteredTransfers.length === 0 && (
+                    <Button onClick={() => setShowCreateModal(true)} className="mt-3">
+                      <Plus className="h-4 w-4" />
+                      Create Transfer
+                    </Button>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -754,13 +1081,12 @@ const TransferPage = () => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-
-              {isAdmin &&
+              {isAdmin && (
                 <div className="space-y-2">
                   <Label htmlFor="toBase">From Base</Label>
                   <Select
                     value={formData.fromBase}
-                    className='w-full'
+                    className="w-full"
                     onValueChange={(value) => setFormData((prev) => ({ ...prev, fromBase: value }))}
                     required={isAdmin}
                   >
@@ -777,7 +1103,8 @@ const TransferPage = () => {
                         ))}
                     </SelectContent>
                   </Select>
-                </div>}
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="toBase">Destination Base</Label>
@@ -840,10 +1167,8 @@ const TransferPage = () => {
                               <SelectItem key={stock.asset._id} value={stock.asset._id}>
                                 {stock.asset.name} (Available: {stock.quantity})
                               </SelectItem>
-                            ))
-                          }
+                            ))}
                         </SelectContent>
-
                       </Select>
                     </div>
                     <div className="w-24 space-y-2">

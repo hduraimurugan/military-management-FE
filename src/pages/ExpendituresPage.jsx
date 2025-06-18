@@ -1,11 +1,27 @@
+"use client"
+
 import { useState, useEffect } from "react"
-import { Plus, Eye, Trash2, DollarSign, Calendar, FileText, MapPin, Search, Filter, X, User } from "lucide-react"
+import {
+  Plus,
+  Eye,
+  Trash2,
+  DollarSign,
+  Calendar,
+  FileText,
+  MapPin,
+  Search,
+  Filter,
+  X,
+  User,
+  ChevronDown,
+  Package,
+} from "lucide-react"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { expenditureAPI, inventoryAPI } from "../services/api.js"
 import { useAssetBase } from "../context/AssetBaseContext"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -30,6 +46,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Separator } from "@/components/ui/separator"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 import { useAuth } from "../context/AuthContext"
 import { toast } from "sonner"
 import { getRoleColor, getRoleLabel } from "../utils/roleColorLabel.js"
@@ -44,7 +63,7 @@ const ExpendituresPage = () => {
     currentPage: 1,
     limit: 10,
     totalPages: 0,
-    base: ""
+    base: "",
   })
 
   const [inventoryData, setInventoryData] = useState([])
@@ -149,7 +168,6 @@ const ExpendituresPage = () => {
   const clearFilters = () => {
     setSearchTerm("")
     setSelectedAssetFilter("")
-    setSelectedBaseFilter("")
     setDateFilter("")
     setExpendedByFilter("")
   }
@@ -269,8 +287,9 @@ const ExpendituresPage = () => {
         </div>
 
         <div className="flex gap-2 items-center">
-          <Button asChild variant='secondary'>
+          <Button variant="outline" asChild>
             <Link to="/stocks">
+              <Package className="mr-2 h-4 w-4" />
               View Stocks
             </Link>
           </Button>
@@ -290,76 +309,211 @@ const ExpendituresPage = () => {
         </Card>
       )}
 
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Search & Filters
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search expenditures..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            <Select value={selectedAssetFilter} onValueChange={setSelectedAssetFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by asset" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All assets</SelectItem>
-                {assets.map((asset) => (
-                  <SelectItem key={asset._id} value={asset._id}>
-                    {asset.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {isAdmin && (
-              <Select value={selectedBaseFilter} onValueChange={setSelectedBaseFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by base" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All bases</SelectItem>
-                  {bases.map((base) => (
-                    <SelectItem key={base._id} value={base._id}>
-                      {base.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      {/* Compact Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Search & Filters
+            </CardTitle>
+            {(searchTerm ||
+              (selectedAssetFilter && selectedAssetFilter !== "all") ||
+              (selectedBaseFilter && selectedBaseFilter !== "all") ||
+              expendedByFilter ||
+              dateFilter) && (
+              <Badge variant="secondary" className="text-xs">
+                {
+                  [
+                    searchTerm,
+                    selectedAssetFilter && selectedAssetFilter !== "all",
+                    selectedBaseFilter && selectedBaseFilter !== "all",
+                    expendedByFilter,
+                    dateFilter,
+                  ].filter(Boolean).length
+                }{" "}
+                active
+              </Badge>
             )}
+          </div>
 
+          {(searchTerm ||
+            (selectedAssetFilter && selectedAssetFilter !== "all") ||
+            (selectedBaseFilter && selectedBaseFilter !== "all") ||
+            expendedByFilter ||
+            dateFilter) && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2">
+              <X className="h-3 w-3 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Compact Filter Controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Search */}
+          <div className="relative min-w-[200px] flex-1 max-w-xs">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
-              placeholder="Filter by expended by"
+              placeholder="Search expenditures..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
+            />
+          </div>
+
+          <Separator orientation="vertical" className="h-6" />
+
+          {/* Asset Filter */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Package className="h-3 w-3 mr-2" />
+                {selectedAssetFilter && selectedAssetFilter !== "all"
+                  ? getAssetById(selectedAssetFilter)?.name
+                  : "Asset"}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start h-8 text-sm",
+                    (!selectedAssetFilter || selectedAssetFilter === "") && "bg-primary/10 text-primary",
+                  )}
+                  onClick={() => setSelectedAssetFilter("")}
+                >
+                  All assets
+                </Button>
+                {assets.map((asset) => (
+                  <Button
+                    key={asset._id}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      selectedAssetFilter === asset._id && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setSelectedAssetFilter(asset._id)}
+                  >
+                    {asset.name}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Base Filter (Admin Only) */}
+          {isAdmin && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <MapPin className="h-3 w-3 mr-2" />
+                  {selectedBaseFilter && selectedBaseFilter !== "all"
+                    ? bases.find((b) => b._id === selectedBaseFilter)?.name
+                    : "Base"}
+                  <ChevronDown className="h-3 w-3 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start">
+                <div className="space-y-1">
+                  {/* <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      (!selectedBaseFilter || selectedBaseFilter === "all") && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setSelectedBaseFilter("all")}
+                  >
+                    All bases
+                  </Button> */}
+                  {bases.map((base) => (
+                    <Button
+                      key={base._id}
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        selectedBaseFilter === base._id && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setSelectedBaseFilter(base._id)}
+                    >
+                      {base.name}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {/* Expended By Filter */}
+          <div className="min-w-[150px]">
+            <Input
+              placeholder="Expended by..."
               value={expendedByFilter}
               onChange={(e) => setExpendedByFilter(e.target.value)}
+              className="h-9"
             />
+          </div>
 
+          {/* Date Filter */}
+          <div className="flex items-center gap-1">
             <Input
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              placeholder="Filter by date"
+              className={cn("h-9 w-auto", dateFilter && "border-primary/50 bg-primary/5")}
             />
           </div>
-          <div className="mt-4 flex items-center gap-2">
-            <Button variant="outline" onClick={clearFilters} className="flex items-center gap-2">
-              <X className="h-4 w-4" />
-              Clear Filters
-            </Button>
+
+          <Separator orientation="vertical" className="h-6" />
+        </div>
+
+        {/* Active Filters Display */}
+        {(searchTerm ||
+          (selectedAssetFilter && selectedAssetFilter !== "all") ||
+          (selectedBaseFilter && selectedBaseFilter !== "all") ||
+          expendedByFilter ||
+          dateFilter) && (
+          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+            <span className="text-xs text-primary/50 font-medium">Active filters:</span>
+            {searchTerm && (
+              <Badge variant="secondary" className="text-xs">
+                Search: {searchTerm}
+                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
+              </Badge>
+            )}
+            {selectedAssetFilter && selectedAssetFilter !== "all" && (
+              <Badge variant="secondary" className="text-xs">
+                {getAssetById(selectedAssetFilter)?.name}
+                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedAssetFilter("all")} />
+              </Badge>
+            )}
+            {selectedBaseFilter && selectedBaseFilter !== "all" && (
+              <Badge variant="secondary" className="text-xs">
+                {bases.find((b) => b._id === selectedBaseFilter)?.name}
+                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedBaseFilter("all")} />
+              </Badge>
+            )}
+            {expendedByFilter && (
+              <Badge variant="secondary" className="text-xs">
+                By: {expendedByFilter}
+                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setExpendedByFilter("")} />
+              </Badge>
+            )}
+            {dateFilter && (
+              <Badge variant="secondary" className="text-xs">
+                Date: {formatDate(dateFilter)}
+                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setDateFilter("")} />
+              </Badge>
+            )}
           </div>
-        </CardContent>
+        )}
       </Card>
 
       {/* Expenditures Table */}
@@ -584,7 +738,7 @@ const ExpendituresPage = () => {
                     <SelectValue placeholder="Select base" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All bases</SelectItem>
+                    {/* <SelectItem value="all">All bases</SelectItem> */}
                     {bases.map((base) => (
                       <SelectItem key={base._id} value={base._id}>
                         {base.name}
@@ -614,18 +768,16 @@ const ExpendituresPage = () => {
                         <SelectContent>
                           {isAdmin
                             ? assets.map((asset) => (
-                              <SelectItem key={asset._id} value={asset._id}>
-                                {asset.name} ({asset.category})
-                              </SelectItem>
-                            ))
+                                <SelectItem key={asset._id} value={asset._id}>
+                                  {asset.name} ({asset.category})
+                                </SelectItem>
+                              ))
                             : inventoryData.map((stock) => (
-                              <SelectItem key={stock.asset._id} value={stock.asset._id}>
-                                {stock.asset.name} (Available: {stock.quantity})
-                              </SelectItem>
-                            ))
-                          }
+                                <SelectItem key={stock.asset._id} value={stock.asset._id}>
+                                  {stock.asset.name} (Available: {stock.quantity})
+                                </SelectItem>
+                              ))}
                         </SelectContent>
-
                       </Select>
                     </div>
                     <div className="w-24 space-y-2">
@@ -740,7 +892,7 @@ const ExpendituresPage = () => {
                 </div>
               </div>
 
-              {selectedExpenditure.approvedBy && (
+              {/* {selectedExpenditure.approvedBy && (
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-muted-foreground">Approved By</Label>
                   <p className="font-medium">{selectedExpenditure.approvedBy.name}</p>
@@ -748,7 +900,7 @@ const ExpendituresPage = () => {
                     {getRoleLabel(selectedExpenditure.approvedBy.role)}
                   </Badge>
                 </div>
-              )}
+              )} */}
             </div>
           )}
           <DialogFooter>
