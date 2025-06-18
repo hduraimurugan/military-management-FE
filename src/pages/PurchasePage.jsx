@@ -31,11 +31,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useAuth } from "../context/AuthContext"
+import { Link } from "react-router-dom";
 
 const PurchasePage = () => {
   const { assets, bases } = useAssetBase()
-  const { user } = useAuth()
-  const isAdmin = user.role === "admin"
+  const { user, isAdmin , isLogisticsOfficer } = useAuth()
   const [purchases, setPurchases] = useState([])
   const [filteredPurchases, setFilteredPurchases] = useState([])
   const [loading, setLoading] = useState(true)
@@ -230,10 +230,18 @@ const PurchasePage = () => {
           </h1>
           <p className="text-muted-foreground mt-1">Manage your purchase bills and inventory records</p>
         </div>
-        <Button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Add Bill
-        </Button>
+
+        <div className="flex gap-2 items-center">
+          <Button asChild variant='secondary'>
+            <Link to="/stocks">
+              View Stocks
+            </Link>
+          </Button>
+          <Button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add Bill
+          </Button>
+        </div>
       </div>
 
       {/* Error Display */}
@@ -399,15 +407,21 @@ const PurchasePage = () => {
           </Table>
 
           {filteredPurchases.length === 0 && (
-            <div className="text-center py-12">
-              <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium">No purchase bills found</h3>
-              <p className="text-muted-foreground">
-                {purchases.length === 0
-                  ? "Get started by creating your first purchase bill."
-                  : "Try adjusting your search or filter criteria."}
-              </p>
-            </div>
+            <>
+              <div className="text-center py-12">
+                <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium">No purchase bills found</h3>
+                <p className="text-muted-foreground">
+                  {purchases.length === 0
+                    ? "Get started by creating your first purchase bill."
+                    : "Try adjusting your search or filter criteria."}
+                </p>
+                <Button onClick={() => setShowCreateModal(true)} className="mt-4">
+                  <Plus className="h-4 w-4" />
+                  Add Bill
+                </Button>
+              </div>
+            </>
           )}
 
           {filteredPurchases.length > 0 && (

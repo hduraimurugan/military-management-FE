@@ -6,6 +6,12 @@ const AuthContext = createContext()
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  
+  const isAdmin = user?.role === "admin"
+  const isCommander = user?.role === "base_commander"
+  const isLogisticsOfficer = user?.role === "logistics_officer"
+
+  const role = user?.role;
 
   const fetchUser = async () => {
     try {
@@ -73,6 +79,10 @@ export const AuthProvider = ({ children }) => {
       logout,
       isLoggedIn: !!user,
       loading,
+      isAdmin,
+      isCommander,
+      isLogisticsOfficer,
+      role
     }}>
       {children}
     </AuthContext.Provider>

@@ -7,12 +7,12 @@ import { Link } from "react-router-dom"
 export const UnauthorizedPage = ({ route = 'this' }) => {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4">
-      <Card className="w-full max-w-md border-2 border-destructive/30 shadow-lg">
+      <Card className="w-full max-w-md border-2  shadow-lg">
         <CardContent className="text-center py-10">
-          <div className="flex justify-center mb-4 text-destructive">
+          <div className="flex justify-center mb-4 text-destructive/90">
             <AlertTriangle className="h-12 w-12" />
           </div>
-          <h1 className="text-3xl font-semibold text-destructive mb-2">
+          <h1 className="text-3xl font-semibold text-destructive/90 mb-2">
             Access Denied
           </h1>
           <p className="text-muted-foreground mb-6">

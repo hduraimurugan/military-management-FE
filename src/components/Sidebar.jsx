@@ -33,8 +33,7 @@ import { getRoleColor, getRoleLabel } from '../utils/roleColorLabel';
 
 
 export const Sidebar = ({ pageTitle }) => {
-  const { user, logout } = useAuth();
-  const role = user?.role;
+  const { user, logout, isAdmin, isLogisticsOfficer, role } = useAuth();
   const location = useLocation();
 
   // Check if the current path matches the link path
@@ -55,25 +54,25 @@ export const Sidebar = ({ pageTitle }) => {
       roles: ['admin', 'base_commander', 'logistics_officer']
     },
     {
-      name: 'Purchases Page',
+      name: 'Purchased Assets',
       path: '/purchase',
       icon: <BiPurchaseTag className="h-5 w-5" />,
       roles: ['admin', 'logistics_officer']
     },
     {
-      name: 'Transfer Page',
+      name: 'Transfered Assets',
       path: '/transfer',
       icon: <ArrowRightLeft className="h-5 w-5" />,
       roles: ['admin', 'logistics_officer']
     },
     {
-      name: 'Assignments Page',
+      name: 'Assigned Assets',
       path: '/assignment',
       icon: <MdOutlineAssignmentTurnedIn className="h-5 w-5" />,
       roles: ['admin', 'base_commander']
     },
     {
-      name: 'Expend Page',
+      name: 'Expended Assets',
       path: '/expend',
       icon: <LucideNotebookText className="h-5 w-5" />,
       roles: ['admin', 'base_commander']
@@ -106,7 +105,6 @@ export const Sidebar = ({ pageTitle }) => {
       roles: ['admin']
     }
   ];
-
 
   // NavItem component for consistent styling of each navigation item
   const NavItem = ({ item }) => (
@@ -227,7 +225,7 @@ export const Sidebar = ({ pageTitle }) => {
               <div className="flex flex-col space-y-0.5">
                 <span className="text-sm font-medium line-clamp-1">{user?.name || 'Admin User'}</span>
                 <div className="flex items-center">
-                  <Badge variant="outline" className={getRoleColor(user.role)}>
+                  <Badge variant="outline" className={getRoleColor(user?.role)}>
                     {getRoleLabel(user?.role)}
                   </Badge>
                 </div>

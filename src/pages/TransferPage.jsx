@@ -14,7 +14,7 @@ import {
   ArrowLeft,
 } from "lucide-react"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
-import { transfersAPI } from "../services/api.js"
+import { inventoryAPI, transfersAPI } from "../services/api.js"
 import { useAssetBase } from "../context/AssetBaseContext"
 
 import { Button } from "@/components/ui/button"
@@ -46,11 +46,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "../context/AuthContext"
 import { toast } from "sonner"
+import { Link } from "react-router-dom"
 
 const TransferPage = () => {
   const { assets, bases } = useAssetBase()
-  const { user } = useAuth()
-  const isAdmin = user.role === "admin"
+  const { user, isAdmin, isLogisticsOfficer } = useAuth()
   const [transferData, setTransferData] = useState({
     transferIn: [],
     transferOut: [],
@@ -61,6 +61,7 @@ const TransferPage = () => {
     currentPage: 1,
     limit: 10,
   })
+  const [inventoryData, setInventoryData] = useState([])
   const [filteredTransfers, setFilteredTransfers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -135,6 +136,25 @@ const TransferPage = () => {
       setFilteredTransfers(transferData.transferIn)
     }
   }, [activeTab, transferData])
+
+  // Fetch inventory for assignment modal
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        // const params = {
+        //   base_id: baseId
+        // }
+        const data = await inventoryAPI.getMyStock()
+        setInventoryData(data.stocks || [])
+      } catch (err) {
+        console.error("Failed to fetch inventory:", err)
+      }
+    }
+
+    if (showCreateModal) {
+      fetchInventory()
+    }
+  }, [showCreateModal])
 
   const clearFilters = () => {
     setSearchTerm("")
@@ -254,10 +274,18 @@ const TransferPage = () => {
           </h1>
           <p className="text-muted-foreground mt-1">Manage asset transfers between bases</p>
         </div>
-        <Button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Create Transfer
-        </Button>
+
+        <div className="flex gap-2 items-center">
+          <Button asChild variant='secondary'>
+            <Link to="/stocks">
+              View Stocks
+            </Link>
+          </Button>
+          <Button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Create Transfer
+          </Button>
+        </div>
       </div>
 
       {/* Error Display */}
@@ -801,12 +829,20 @@ const TransferPage = () => {
                           <SelectValue placeholder="Select Asset" />
                         </SelectTrigger>
                         <SelectContent>
-                          {assets.map((asset) => (
-                            <SelectItem key={asset._id} value={asset._id}>
-                              {asset.name} ({asset.category})
-                            </SelectItem>
-                          ))}
+                          {isAdmin
+                            ? assets.map((asset) => (
+                              <SelectItem key={asset._id} value={asset._id}>
+                                {asset.name} ({asset.category})
+                              </SelectItem>
+                            ))
+                            : inventoryData.map((stock) => (
+                              <SelectItem key={stock.asset._id} value={stock.asset._id}>
+                                {stock.asset.name} (Available: {stock.quantity})
+                              </SelectItem>
+                            ))
+                          }
                         </SelectContent>
+
                       </Select>
                     </div>
                     <div className="w-24 space-y-2">

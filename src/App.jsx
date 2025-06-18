@@ -1,7 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { ThemeProvider } from "./context/ThemeContext";
 import { Toaster } from "@/components/ui/sonner"
-import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './routes/ProtectedRoutes.jsx'
 import { Layout } from './components/Layout'
 import { LoginPage } from './pages/LoginPage'
@@ -14,64 +12,64 @@ import TransferPage from './pages/TransferPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import AssignmentPage from './pages/AssignmentPage.jsx';
 import { UnauthorizedPage } from './pages/UnauthorizedPage.jsx';
-import { AssetBaseProvider } from './context/AssetBaseContext.jsx';
 import StocksPage from './pages/StocksPage.jsx';
 import ExpendituresPage from './pages/ExpendituresPage.jsx';
+import { useAuth } from './context/AuthContext.jsx'
 
 function App() {
+  const { user } = useAuth();
+
   return (
     <>
-      <ThemeProvider>
-        <AuthProvider>
-          <AssetBaseProvider>
-            <Router>
-              <Routes>
-                <Route path="/login" element={<LoginPage />} />
+      <Router>
+        <Routes>
+          <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
 
-                <Route element={
-                  <ProtectedRoute allowedRoles={['admin', 'base_commander', 'logistics_officer']}>
-                    <Layout />
-                  </ProtectedRoute>}>
-                  <Route path="/" element={<DashboardPage />} />
-                  <Route path="/unauthorized" element={<UnauthorizedPage />} />
-                  <Route path="/stocks" element={<StocksPage />} />
-                  <Route path="/reports" element={<ReportsPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                </Route>
+          {/* Login required, but all user can access these routes */}
+          <Route element={
+            <ProtectedRoute allowedRoles={['admin', 'base_commander', 'logistics_officer']}>
+              <Layout />
+            </ProtectedRoute>}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
+            <Route path="/stocks" element={<StocksPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
 
-                <Route element={
-                  <ProtectedRoute allowedRoles={['admin']}>
-                    <Layout />
-                  </ProtectedRoute>}>
-                  <Route path="/users" element={<UsersPage />} />
-                  <Route path="/settings" element={<SettingsPage />} />
-                </Route>
+          {/* Login required, Only Admin routes */}
+          <Route element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <Layout />
+            </ProtectedRoute>}>
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Route>
 
-                <Route element={
-                  <ProtectedRoute allowedRoles={['admin', 'base_commander']}>
-                    <Layout />
-                  </ProtectedRoute>}>
-                  <Route path="/assignment" element={<AssignmentPage />} />
-                  <Route path="/expend" element={<ExpendituresPage />} />
-                </Route>
+          {/* Login required, Only Admin and Base Commander routes */}
+          <Route element={
+            <ProtectedRoute allowedRoles={['admin', 'base_commander']}>
+              <Layout />
+            </ProtectedRoute>}>
+            <Route path="/assignment" element={<AssignmentPage />} />
+            <Route path="/expend" element={<ExpendituresPage />} />
+          </Route>
 
-                <Route element={
-                  <ProtectedRoute allowedRoles={['admin', 'logistics_officer']}>
-                    <Layout />
-                  </ProtectedRoute>}>
-                  <Route path="/purchase" element={<PurchasePage />} />
-                  <Route path="/transfer" element={<TransferPage />} />
-                </Route>
+          {/* Login required, Only Admin and Base Logistics officer routes */}
+          <Route element={
+            <ProtectedRoute allowedRoles={['admin', 'logistics_officer']}>
+              <Layout />
+            </ProtectedRoute>}>
+            <Route path="/purchase" element={<PurchasePage />} />
+            <Route path="/transfer" element={<TransferPage />} />
+          </Route>
 
 
-                {/* Catch-all route - redirect to home */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Router>
-            <Toaster position="top-right" />
-          </AssetBaseProvider>
-        </AuthProvider>
-      </ThemeProvider>
+          {/* Catch-all route - redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+      <Toaster position="top-right" />
     </>
   )
 }

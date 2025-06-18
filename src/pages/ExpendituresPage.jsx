@@ -1,9 +1,7 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { Plus, Eye, Trash2, DollarSign, Calendar, FileText, MapPin, Search, Filter, X, User } from "lucide-react"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
-import { expenditureAPI } from "../services/api.js"
+import { expenditureAPI, inventoryAPI } from "../services/api.js"
 import { useAssetBase } from "../context/AssetBaseContext"
 
 import { Button } from "@/components/ui/button"
@@ -35,12 +33,11 @@ import {
 import { useAuth } from "../context/AuthContext"
 import { toast } from "sonner"
 import { getRoleColor, getRoleLabel } from "../utils/roleColorLabel.js"
+import { Link } from "react-router-dom"
 
 const ExpendituresPage = () => {
   const { assets, bases } = useAssetBase()
-  const { user } = useAuth()
-  const isAdmin = user.role === "admin"
-
+  const { user, isAdmin, isLogisticsOfficer } = useAuth()
   const [expenditureData, setExpenditureData] = useState({
     expenditures: [],
     total: 0,
@@ -49,6 +46,7 @@ const ExpendituresPage = () => {
     totalPages: 0,
   })
 
+  const [inventoryData, setInventoryData] = useState([])
   const [filteredExpenditures, setFilteredExpenditures] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -130,6 +128,22 @@ const ExpendituresPage = () => {
     }
     setFilteredExpenditures(filtered)
   }, [searchTerm, expenditureData.expenditures])
+
+  // Fetch inventory for assignment modal
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const data = await inventoryAPI.getMyStock()
+        setInventoryData(data.stocks || [])
+      } catch (err) {
+        console.error("Failed to fetch inventory:", err)
+      }
+    }
+
+    if (showCreateModal) {
+      fetchInventory()
+    }
+  }, [showCreateModal])
 
   const clearFilters = () => {
     setSearchTerm("")
@@ -252,10 +266,18 @@ const ExpendituresPage = () => {
           </h1>
           <p className="text-muted-foreground mt-1">Track and manage asset expenditures</p>
         </div>
-        <Button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Expend
-        </Button>
+
+        <div className="flex gap-2 items-center">
+          <Button asChild variant='secondary'>
+            <Link to="/stocks">
+              View Stocks
+            </Link>
+          </Button>
+          <Button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Expend
+          </Button>
+        </div>
       </div>
 
       {/* Error Display */}
@@ -589,12 +611,20 @@ const ExpendituresPage = () => {
                           <SelectValue placeholder="Select Asset" />
                         </SelectTrigger>
                         <SelectContent>
-                          {assets.map((asset) => (
-                            <SelectItem key={asset._id} value={asset._id}>
-                              {asset.name} ({asset.category})
-                            </SelectItem>
-                          ))}
+                          {isAdmin
+                            ? assets.map((asset) => (
+                              <SelectItem key={asset._id} value={asset._id}>
+                                {asset.name} ({asset.category})
+                              </SelectItem>
+                            ))
+                            : inventoryData.map((stock) => (
+                              <SelectItem key={stock.asset._id} value={stock.asset._id}>
+                                {stock.asset.name} (Available: {stock.quantity})
+                              </SelectItem>
+                            ))
+                          }
                         </SelectContent>
+
                       </Select>
                     </div>
                     <div className="w-24 space-y-2">

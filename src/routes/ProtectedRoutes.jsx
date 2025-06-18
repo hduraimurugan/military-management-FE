@@ -4,7 +4,7 @@ import { UnauthorizedPage } from '../pages/UnauthorizedPage.jsx'
 import { LoadingPage } from '../pages/LoadingPage.jsx'
 
 export const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, loading } = useAuth()
+  const { user, loading, role } = useAuth()
 
   if (loading) {
     return <LoadingPage />
@@ -14,7 +14,7 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" replace />
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && !allowedRoles.includes(role)) {
     // Option 1: Redirect to Unauthorized Page route
     return <Navigate to="/unauthorized" replace />
 

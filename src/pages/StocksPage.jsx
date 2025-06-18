@@ -4,9 +4,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
 import {
   AlertTriangle,
   Search,
@@ -16,24 +16,32 @@ import {
   TrendingUp,
   TrendingDown,
   ArrowUpDown,
+  Package2,
+  Plus,
+  X,
+  ChevronDown,
+  Building2,
+  Tag,
 } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { inventoryAPI } from "../services/api"
-import { useDebounce } from 'use-debounce';
+import { useDebounce } from "use-debounce"
 import { useAuth } from "../context/AuthContext"
 import { useAssetBase } from "../context/AssetBaseContext"
+import { Link } from "react-router-dom"
+import { lowStockConstant } from "../utils/constants"
 
 const StocksPage = () => {
-  const { user } = useAuth();
+  const { user, isAdmin , isLogisticsOfficer} = useAuth()
   const { bases } = useAssetBase()
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
+  const [searchTerm, setSearchTerm] = useState("")
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500)
 
-  const [inventoryData, setInventoryData] = useState([]);
-  const [baseInfo, setBaseInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [inventoryData, setInventoryData] = useState([])
+  const [baseInfo, setBaseInfo] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -44,19 +52,19 @@ const StocksPage = () => {
     dateFrom: null,
     dateTo: null,
     showLowStock: false,
-    base_id: user?.role === 'admin' && bases.length > 0 ? bases[0]._id : ""
-  });
+    base_id: isAdmin && bases.length > 0 ? bases[0]._id : "",
+  })
 
   const [sortConfig, setSortConfig] = useState({
     key: null,
-    direction: "asc"
-  });
+    direction: "asc",
+  })
 
   // Fetch inventory data with filters
   useEffect(() => {
     const fetchInventoryData = async () => {
       try {
-        setLoading(true);
+        setLoading(true)
 
         // Prepare query params
         const params = {
@@ -69,42 +77,41 @@ const StocksPage = () => {
           dateTo: filters.dateTo ? format(filters.dateTo, "yyyy-MM-dd") : undefined,
           sortField: sortConfig.key,
           sortDirection: sortConfig.direction,
-          base_id: filters.base_id
-        };
+          base_id: filters.base_id,
+        }
 
         // Remove undefined params
-        const queryParams = Object.fromEntries(
-          Object.entries(params).filter(([_, value]) => value !== undefined)
-        );
+        const queryParams = Object.fromEntries(Object.entries(params).filter(([_, value]) => value !== undefined))
 
-        const data = await inventoryAPI.getMyStock(queryParams);
+        const data = await inventoryAPI.getMyStock(queryParams)
 
-        setInventoryData(data.stocks);
-        setBaseInfo(data.base);
-        setLoading(false);
+        setInventoryData(data.stocks)
+        setBaseInfo(data.base)
+        setLoading(false)
       } catch (err) {
-        setError(err.message);
-        setLoading(false);
+        setError(err.message)
+        setLoading(false)
       }
-    };
+    }
 
-    fetchInventoryData();
-  }, [filters, sortConfig]); // Re-fetch when filters or sort change
+    fetchInventoryData()
+  }, [filters, sortConfig]) // Re-fetch when filters or sort change
 
   // Update your useEffect to use debouncedSearchTerm
   useEffect(() => {
-    setFilters(prev => ({ ...prev, asset: debouncedSearchTerm }));
-  }, [debouncedSearchTerm]);
+    setFilters((prev) => ({ ...prev, asset: debouncedSearchTerm }))
+  }, [debouncedSearchTerm])
 
   const handleSort = (key) => {
-    let direction = "asc";
+    let direction = "asc"
     if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
+      direction = "desc"
     }
-    setSortConfig({ key, direction });
-  };
+    setSortConfig({ key, direction })
+  }
 
   const clearFilters = () => {
+    setSearchTerm("")
     setFilters({
       asset: "",
       category: "All categories",
@@ -113,16 +120,29 @@ const StocksPage = () => {
       dateFrom: null,
       dateTo: null,
       showLowStock: false,
-      base_id: user?.role === 'admin' && bases.length > 0 ? bases[0]._id : ""
-    });
-    setSortConfig({ key: null, direction: "asc" });
-  };
+      base_id: user?.role === "admin" && bases.length > 0 ? bases[0]._id : "",
+    })
+    setSortConfig({ key: null, direction: "asc" })
+  }
 
   // Calculate low stock count from current filtered results
   const lowStockCount = useMemo(() => {
-    return inventoryData.filter(item => item.quantity < 10).length;
-  }, [inventoryData]);
+    return inventoryData.filter((item) => item.quantity < lowStockConstant).length
+  }, [inventoryData])
 
+  // Helper function to get active filters count
+  const getActiveFiltersCount = () => {
+    let count = 0
+    if (searchTerm) count++
+    if (filters.category !== "All categories") count++
+    if (filters.base_id && filters.base_id !== "All bases") count++
+    if (filters.dateFrom) count++
+    if (filters.dateTo) count++
+    if (filters.showLowStock) count++
+    return count
+  }
+
+  const activeFiltersCount = getActiveFiltersCount()
 
   if (loading) {
     return (
@@ -210,159 +230,247 @@ const StocksPage = () => {
         </Card>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filters
-          </CardTitle>
-          <CardDescription>Filter your inventory data to find specific items</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Asset Name</label>
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search assets..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Category</label>
-              <Select
-                value={filters.category}
-                onValueChange={(value) => setFilters((prev) => ({ ...prev, category: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="All categories" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All categories">All categories</SelectItem>
-                  {['weapon', 'vehicle', 'ammunition', 'equipment'].map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {user.role === "admin" &&
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Bases</label>
-                <Select
-                  value={filters.base_id}
-                  onValueChange={(value) => setFilters((prev) => ({ ...prev, base_id: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="All bases" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="All bases">All categories</SelectItem>
-                    {bases.map((base) => (
-                      <SelectItem key={base._id} value={base._id}>
-                        {base.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            }
-
-            <div className="space-y-2 hidden">
-              <label className="text-sm font-medium">Quantity Range</label>
-              <div className="flex gap-2">
-                <Input
-                  type="number"
-                  placeholder="Min"
-                  value={filters.minQuantity}
-                  onChange={(e) => setFilters((prev) => ({ ...prev, minQuantity: e.target.value }))}
-                />
-                <Input
-                  type="number"
-                  placeholder="Max"
-                  value={filters.maxQuantity}
-                  onChange={(e) => setFilters((prev) => ({ ...prev, maxQuantity: e.target.value }))}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Date From</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !filters.dateFrom && "text-muted-foreground",
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {filters.dateFrom ? format(filters.dateFrom, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={filters.dateFrom}
-                    onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Date To</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !filters.dateTo && "text-muted-foreground",
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {filters.dateTo ? format(filters.dateTo, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={filters.dateTo}
-                    onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="flex items-end">
-              <Button
-                variant="outline"
-                onClick={() => setFilters((prev) => ({ ...prev, showLowStock: !prev.showLowStock }))}
-                className={cn("w-full", filters.showLowStock && "bg-destructive text-destructive-foreground")}
-              >
-                <AlertTriangle className="mr-2 h-4 w-4" />
-                {filters.showLowStock ? "Showing Low Stock" : "Show Low Stock"}
-              </Button>
-            </div>
-
-            <div className="flex items-end">
-              <Button variant="ghost" onClick={clearFilters} className="w-full">
-                Clear Filters
-              </Button>
-            </div>
+      {/* Compact Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-0">
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Search & Filters
+            </CardTitle>
+            {activeFiltersCount > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {activeFiltersCount} active
+              </Badge>
+            )}
           </div>
-        </CardContent>
+
+          {activeFiltersCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className=" h-8 px-2"
+            >
+              <X className="h-3 w-3 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Compact Filter Controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Search */}
+          <div className="relative min-w-[200px] flex-1 max-w-xs">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search assets..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 h-9  focus:border-primary/50 focus:ring-primary/20"
+            />
+          </div>
+
+          <Separator orientation="vertical" className="h-6" />
+
+          {/* Category */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 ">
+                <Tag className="h-3 w-3 mr-2" />
+                {filters.category === "All categories" ? "Category" : filters.category}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1">
+                {["All categories", "weapon", "vehicle", "ammunition", "equipment"].map((category) => (
+                  <Button
+                    key={category}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      filters.category === category && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setFilters((prev) => ({ ...prev, category }))}
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Base Selector (Admin Only) */}
+          {isAdmin && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9 ">
+                  <Building2 className="h-3 w-3 mr-2" />
+                  {filters.base_id === "All bases" || !filters.base_id
+                    ? "Base"
+                    : bases.find((b) => b._id === filters.base_id)?.name}
+                  <ChevronDown className="h-3 w-3 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start">
+                <div className="space-y-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      (filters.base_id === "All bases" || !filters.base_id) && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setFilters((prev) => ({ ...prev, base_id: "All bases" }))}
+                  >
+                    All bases
+                  </Button>
+                  {bases.map((base) => (
+                    <Button
+                      key={base._id}
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        filters.base_id === base._id && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setFilters((prev) => ({ ...prev, base_id: base._id }))}
+                    >
+                      {base.name}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {/* Date Range */}
+          <div className="flex items-center gap-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateFrom && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateFrom ? format(filters.dateFrom, "MMM dd") : "From"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateFrom}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-primary/50 text-sm">to</span>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateTo && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateTo ? format(filters.dateTo, "MMM dd") : "To"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateTo}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <Separator orientation="vertical" className="h-6" />
+
+          {/* Low Stock Toggle */}
+          <Button
+            variant={filters.showLowStock ? "destructive" : "outline"}
+            size="sm"
+            onClick={() => setFilters((prev) => ({ ...prev, showLowStock: !prev.showLowStock }))}
+            className={cn("h-9", !filters.showLowStock && "")}
+          >
+            <AlertTriangle className="h-3 w-3 mr-2" />
+            Low Stock
+          </Button>
+        </div>
+
+        {/* Active Filters Display */}
+        {activeFiltersCount > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+            <span className="text-xs text-primary/50 font-medium">Active filters:</span>
+            {searchTerm && (
+              <Badge variant="secondary" className="text-xs">
+                Search: {searchTerm}
+                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
+              </Badge>
+            )}
+            {filters.category !== "All categories" && (
+              <Badge variant="secondary" className="text-xs">
+                {filters.category}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, category: "All categories" }))}
+                />
+              </Badge>
+            )}
+            {filters.base_id && filters.base_id !== "All bases" && (
+              <Badge variant="secondary" className="text-xs">
+                {bases.find((b) => b._id === filters.base_id)?.name}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, base_id: "All bases" }))}
+                />
+              </Badge>
+            )}
+            {filters.dateFrom && (
+              <Badge variant="secondary" className="text-xs">
+                From: {format(filters.dateFrom, "MMM dd")}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, dateFrom: null }))}
+                />
+              </Badge>
+            )}
+            {filters.dateTo && (
+              <Badge variant="secondary" className="text-xs">
+                To: {format(filters.dateTo, "MMM dd")}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, dateTo: null }))}
+                />
+              </Badge>
+            )}
+            {filters.showLowStock && (
+              <Badge variant="destructive" className="text-xs">
+                Low Stock
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, showLowStock: false }))}
+                />
+              </Badge>
+            )}
+          </div>
+        )}
       </Card>
 
       {/* Inventory Table */}
@@ -378,10 +486,11 @@ const StocksPage = () => {
                 <TableRow>
                   <TableHead className="w-[50px]">Alert</TableHead>
                   <TableHead>
-                    <Button 
-                    variant="ghost" 
-                    // onClick={() => handleSort("asset")} 
-                    className="h-auto p-0 font-semibold">
+                    <Button
+                      variant="ghost"
+                      // onClick={() => handleSort("asset")}
+                      className="h-auto p-0 font-semibold"
+                    >
                       Asset
                       {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                     </Button>
@@ -389,10 +498,7 @@ const StocksPage = () => {
                   <TableHead>Category</TableHead>
                   {/* <TableHead>Location</TableHead> */}
                   <TableHead>
-                    <Button 
-                    variant="ghost" 
-                    onClick={() => handleSort("quantity")} 
-                    className="h-auto p-0 font-semibold">
+                    <Button variant="ghost" onClick={() => handleSort("quantity")} className="h-auto p-0 font-semibold">
                       Quantity
                       <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
@@ -410,17 +516,19 @@ const StocksPage = () => {
                   <TableHead>
                     <Button
                       variant="ghost"
-                      // onClick={() => handleSort("expended")} 
-                      className="h-auto p-0 font-semibold">
+                      // onClick={() => handleSort("expended")}
+                      className="h-auto p-0 font-semibold"
+                    >
                       Expended
                       {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                     </Button>
                   </TableHead>
                   <TableHead>
-                    <Button 
-                    variant="ghost" 
-                    // onClick={() => handleSort("assigned")} 
-                    className="h-auto p-0 font-semibold">
+                    <Button
+                      variant="ghost"
+                      // onClick={() => handleSort("assigned")}
+                      className="h-auto p-0 font-semibold"
+                    >
                       Assigned
                       {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                     </Button>
@@ -432,9 +540,9 @@ const StocksPage = () => {
               </TableHeader>
               <TableBody>
                 {inventoryData.map((item) => (
-                  <TableRow key={item._id} className={item.quantity < 10 ? "bg-destructive/5" : ""}>
+                  <TableRow key={item._id} className={item.quantity < lowStockConstant ? "bg-destructive/5" : ""}>
                     <TableCell>
-                      {item.quantity < 10 && <AlertTriangle className="h-4 w-4 text-destructive" />}
+                      {item.quantity < lowStockConstant && <AlertTriangle className="h-4 w-4 text-destructive" />}
                     </TableCell>
                     <TableCell className="font-medium">
                       <div>
@@ -449,7 +557,7 @@ const StocksPage = () => {
                       <Badge variant="secondary">{item.asset.category}</Badge>
                     </TableCell> */}
                     <TableCell className="text-center">
-                      <Badge variant={item.quantity < 10 ? "destructive" : "default"} className="font-mono">
+                      <Badge variant={item.quantity < lowStockConstant ? "destructive" : "default"} className="font-mono">
                         {item.quantity}
                       </Badge>
                     </TableCell>
@@ -466,9 +574,27 @@ const StocksPage = () => {
               </TableBody>
             </Table>
             {inventoryData.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                No inventory items found matching your filters.
-              </div>
+              <>
+                <div className="text-center py-12">
+                  <Package2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium">No inventory items found matching your filters.</h3>
+                  <p className="text-muted-foreground mb-4">
+                    {inventoryData.length === 0
+                      ? "Get started by creating your first purchase bill."
+                      : "Try adjusting your search or filter criteria."}
+                  </p>
+
+                  {(isAdmin || isLogisticsOfficer) && inventoryData.length === 0 && (
+                    <Button asChild>
+                      <Link to="/purchase">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Purchase Bill
+                      </Link>
+                    </Button>
+                  )}
+
+                </div>
+              </>
             )}
           </div>
         </CardContent>

@@ -31,14 +31,15 @@ import {
   Sun,
   Moon,
   Home,
-  ChevronRight
+  ChevronRight,
+  LocateIcon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { MdInventory } from 'react-icons/md';
+import { IoLocationSharp } from "react-icons/io5";
 import { getRoleColor, getRoleLabel } from '../utils/roleColorLabel';
 
 export const Layout = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin, isLogisticsOfficer } = useAuth();
   const [pageTitle, setPageTitle] = useState('Dashboard');
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024);
   const [searchValue, setSearchValue] = useState('');
@@ -102,7 +103,10 @@ export const Layout = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
                 <FaPersonMilitaryRifle className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-semibold text-lg hidden sm:inline-block">Military Base Managemen</span>
+              <span className="font-semibold text-lg hidden sm:inline-block">
+                Military Base 
+                {isAdmin ? "Management" : user.baseName}
+              </span>
             </Link>
 
             {/* App logo/title for Web */}
@@ -111,9 +115,31 @@ export const Layout = () => {
                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
                   <FaPersonMilitaryRifle className="h-5 w-5 text-primary-foreground" />
                 </div>
-                <span className="font-semibold text-lg">Military Base Management</span>
+                <span className="font-semibold text-lg">
+                  Military Asset
+                  {/* {isAdmin ? "Management" : user.baseName} */}
+                </span>
               </Link>
             </div>
+
+            {/* Location */}
+            <Badge
+              variant="outline"
+              className="flex items-center gap-2 bg-primary/10 border-primary/20 text-primary rounded-md px-3 py-1"
+            >
+              <IoLocationSharp className="text-primary text-lg" />
+              <div className="flex flex-row gap-1 leading-tight text-xs">
+                <span className="font-semibold">
+                  {isAdmin ? "Base" : user.baseName}
+                </span>
+                <span className="font-semibold">
+                  ,
+                </span>
+                <span className="text-muted-foreground">
+                  {isAdmin ? "India" : user.state}
+                </span>
+              </div>
+            </Badge>
           </div>
 
           {/* Center section with search */}
@@ -134,6 +160,25 @@ export const Layout = () => {
 
           {/* Right side actions */}
           <div className="flex items-center justify-end gap-2">
+            {/* Location */}
+            {/* <Badge
+              variant="outline"
+              className="flex items-center gap-2 bg-primary/10 border-primary/20 text-primary rounded-md px-3 py-1"
+            >
+              <IoLocationSharp className="text-primary text-lg" />
+              <div className="flex flex-row gap-1 leading-tight text-xs">
+                <span className="font-semibold">
+                  {isAdmin ? "Base" : user.baseName}
+                </span>
+                <span className="font-semibold">
+                  ,
+                </span>
+                <span className="text-muted-foreground">
+                  {isAdmin ? "India" : user.state}
+                </span>
+              </div>
+            </Badge> */}
+
             {/* Theme Toggle */}
             <Button
               variant="ghost"

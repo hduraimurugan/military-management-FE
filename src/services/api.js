@@ -351,8 +351,8 @@ export const expenditureAPI = {
   },
 
   // 🔄 Mark assigned assets as expended
-  markAssignedAsExpended: async (data) => {
-    const response = await fetch(`${API_BASE_URL}/api/expend/markAssignedAsExpended`, {
+  markAssignedAsExpended: async (data,id) => {
+    const response = await fetch(`${API_BASE_URL}/api/expend/markAssignedAsExpended/${id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -417,5 +417,79 @@ export const expenditureAPI = {
     }
 
     return response.json();
+  },
+};
+
+// Assign Api
+export const assignmentAPI = {
+  // 📦 Create a new assignment
+  create: async (data) => {
+    const response = await fetch(`${API_BASE_URL}/api/assign/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to create assignment";
+      throw new Error(errorMessage);
+    }
+
+    return result;
+  },
+
+  // ❌ Delete an assignment by ID
+  delete: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/api/assign/delete/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to delete assignment";
+      throw new Error(errorMessage);
+    }
+
+    return result;
+  },
+
+  // 📋 Get all assignments for the current user's base
+  getAll: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/api/assign/getMy?${query}`, {
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to fetch assignments";
+      throw new Error(errorMessage);
+    }
+
+    return result;
+  },
+
+  // 🔍 Get a single assignment by ID
+  getById: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/api/assign/get/${id}`, {
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to fetch assignment";
+      throw new Error(errorMessage);
+    }
+
+    return result;
   },
 };
