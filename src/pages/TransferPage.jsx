@@ -50,6 +50,7 @@ import { toast } from "sonner"
 const TransferPage = () => {
   const { assets, bases } = useAssetBase()
   const { user } = useAuth()
+  const isAdmin = user.role === "admin"
   const [transferData, setTransferData] = useState({
     transferIn: [],
     transferOut: [],
@@ -74,7 +75,7 @@ const TransferPage = () => {
   const [selectedAssetFilter, setSelectedAssetFilter] = useState("")
   const [selectedBaseFilter, setSelectedBaseFilter] = useState("")
   const [dateFilter, setDateFilter] = useState("")
-  const [baseId, setBaseId] = useState(user?.role === 'admin' && bases.length > 0 ? bases[0]._id : "")
+  const [baseId, setBaseId] = useState(isAdmin && bases.length > 0 ? bases[0]._id : "")
 
   // Form state
   const [formData, setFormData] = useState({
@@ -124,7 +125,7 @@ const TransferPage = () => {
 
   useEffect(() => {
     fetchTransfers()
-  }, [transferData.currentPage, selectedBaseFilter, selectedAssetFilter, dateFilter])
+  }, [transferData.currentPage, selectedBaseFilter, selectedAssetFilter, dateFilter, baseId])
 
   // Add a separate useEffect for tab changes
   useEffect(() => {
@@ -316,7 +317,7 @@ const TransferPage = () => {
                   </SelectContent>
                 </Select>
 
-                {user.role === "admin" &&
+                {isAdmin &&
                   <Select value={baseId} onValueChange={setBaseId}>
                     <SelectTrigger>
                       <SelectValue placeholder="Filter by source" />
@@ -488,7 +489,7 @@ const TransferPage = () => {
                   </SelectContent>
                 </Select>
 
-                {user.role === "admin" &&
+                {isAdmin &&
                   <Select value={baseId} onValueChange={setBaseId}>
                     <SelectTrigger>
                       <SelectValue placeholder="Filter by destination" />
@@ -723,27 +724,53 @@ const TransferPage = () => {
                 />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-4">
 
-            <div className="space-y-2">
-              <Label htmlFor="toBase">Destination Base</Label>
-              <Select
-                value={formData.toBase}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, toBase: value }))}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select destination base" />
-                </SelectTrigger>
-                <SelectContent>
-                  {bases
-                    .filter((base) => base._id !== user?.base?._id)
-                    .map((base) => (
-                      <SelectItem key={base._id} value={base._id}>
-                        {base.name} - {base.district}, {base.state}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+              {isAdmin &&
+                <div className="space-y-2">
+                  <Label htmlFor="toBase">From Base</Label>
+                  <Select
+                    value={formData.fromBase}
+                    className='w-full'
+                    onValueChange={(value) => setFormData((prev) => ({ ...prev, fromBase: value }))}
+                    required={isAdmin}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select from base" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {bases
+                        .filter((base) => base._id !== user?.base?._id)
+                        .map((base) => (
+                          <SelectItem key={base._id} value={base._id}>
+                            {base.name} - {base.district}, {base.state}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>}
+
+              <div className="space-y-2">
+                <Label htmlFor="toBase">Destination Base</Label>
+                <Select
+                  value={formData.toBase}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, toBase: value }))}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select destination base" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {bases
+                      .filter((base) => base._id !== user?.base?._id)
+                      .map((base) => (
+                        <SelectItem key={base._id} value={base._id}>
+                          {base.name} - {base.district}, {base.state}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="space-y-2">

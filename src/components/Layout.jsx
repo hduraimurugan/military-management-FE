@@ -117,7 +117,7 @@ export const Layout = () => {
           </div>
 
           {/* Center section with search */}
-          <div className="flex flex-1 items-center justify-end lg:justify-center px-2">
+          <div className="hidden flex flex-1 items-center justify-end lg:justify-center px-2">
             <form onSubmit={handleSearch} className="relative hidden md:block w-full max-w-sm">
               <Search className={`absolute left-2.5 top-2.5 h-4 w-4 ${isSearchFocused ? 'text-primary' : 'text-muted-foreground'}`} />
               <Input

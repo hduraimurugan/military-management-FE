@@ -326,3 +326,96 @@ export const transfersAPI = {
     return response.json();
   },
 };
+
+// Expenditures API
+export const expenditureAPI = {
+  // 💸 Create a new expenditure
+  create: async (data) => {
+    const response = await fetch(`${API_BASE_URL}/api/expend/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to create expenditure";
+      throw new Error(errorMessage);
+    }
+
+    return result;
+  },
+
+  // 🔄 Mark assigned assets as expended
+  markAssignedAsExpended: async (data) => {
+    const response = await fetch(`${API_BASE_URL}/api/expend/markAssignedAsExpended`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to mark assets as expended";
+      throw new Error(errorMessage);
+    }
+
+    return result;
+  },
+
+  // ❌ Delete an expenditure by ID
+  delete: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/api/expend/delete/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to delete expenditure";
+      throw new Error(errorMessage);
+    }
+
+    return result;
+  },
+
+  // 📋 Get all expenditures for the current user's base
+  getAll: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/api/expend/getMy?${query}`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const result = await response.json();
+      const errorMessage = result?.error || result?.message || "Failed to fetch expenditures";
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  },
+
+  // 🔍 Get a single expenditure by ID
+  getById: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/api/expend/get/${id}`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const result = await response.json();
+      const errorMessage = result?.error || result?.message || "Failed to fetch expenditure";
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  },
+};

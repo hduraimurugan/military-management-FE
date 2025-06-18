@@ -35,6 +35,7 @@ import { useAuth } from "../context/AuthContext"
 const PurchasePage = () => {
   const { assets, bases } = useAssetBase()
   const { user } = useAuth()
+  const isAdmin = user.role === "admin"
   const [purchases, setPurchases] = useState([])
   const [filteredPurchases, setFilteredPurchases] = useState([])
   const [loading, setLoading] = useState(true)
@@ -47,7 +48,7 @@ const PurchasePage = () => {
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedAssetFilter, setSelectedAssetFilter] = useState("")
-  const [selectedBaseFilter, setSelectedBaseFilter] = useState("");
+  const [selectedBaseFilter, setSelectedBaseFilter] = useState(isAdmin && bases.length > 0 ? bases[0]._id : "");
   const [dateFilter, setDateFilter] = useState("")
 
   // Form state
@@ -286,7 +287,7 @@ const PurchasePage = () => {
               </SelectContent>
             </Select>
 
-            {user.role === "admin" &&
+            {isAdmin &&
               <Select value={selectedBaseFilter} onValueChange={setSelectedBaseFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="Filter by base" />
@@ -653,7 +654,7 @@ const PurchasePage = () => {
             </div>
 
             {/* Add this section for base selection (admin only) */}
-            {user?.role === "admin" && (
+            {isAdmin && (
               <div className="space-y-2">
                 <Label htmlFor="editBase">Base</Label>
                 <Select

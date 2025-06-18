@@ -16,7 +16,7 @@ import AssignmentPage from './pages/AssignmentPage.jsx';
 import { UnauthorizedPage } from './pages/UnauthorizedPage.jsx';
 import { AssetBaseProvider } from './context/AssetBaseContext.jsx';
 import StocksPage from './pages/StocksPage.jsx';
-import ExpendedPage from './pages/ExpendedPage.jsx';
+import ExpendituresPage from './pages/ExpendituresPage.jsx';
 
 function App() {
   return (
@@ -52,7 +52,7 @@ function App() {
                     <Layout />
                   </ProtectedRoute>}>
                   <Route path="/assignment" element={<AssignmentPage />} />
-                  <Route path="/expend" element={<ExpendedPage />} />
+                  <Route path="/expend" element={<ExpendituresPage />} />
                 </Route>
 
                 <Route element={

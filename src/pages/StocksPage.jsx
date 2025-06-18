@@ -438,12 +438,12 @@ const StocksPage = () => {
                     </TableCell>
                     <TableCell className="font-medium">
                       <div>
-                        <div className="font-semibold">{item.asset.name}</div>
-                        <div className="text-sm text-muted-foreground">{item.asset.category}</div>
+                        <div className="font-semibold">{item?.asset?.name}</div>
+                        <div className="text-sm text-muted-foreground">{item?.asset?.category}</div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{item.asset.category}</Badge>
+                      <Badge variant="outline">{item?.asset?.category}</Badge>
                     </TableCell>
                     {/* <TableCell>
                       <Badge variant="secondary">{item.asset.category}</Badge>

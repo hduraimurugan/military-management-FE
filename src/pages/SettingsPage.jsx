@@ -195,15 +195,15 @@ export const SettingsPage = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="assets" className="space-y-6">
+      <Tabs defaultValue="bases" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="assets" className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
-            Assets
-          </TabsTrigger>
           <TabsTrigger value="bases" className="flex items-center gap-2">
             <Database className="h-4 w-4" />
             Bases
+          </TabsTrigger>
+          <TabsTrigger value="assets" className="flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            Assets
           </TabsTrigger>
         </TabsList>
 
