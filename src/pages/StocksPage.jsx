@@ -317,7 +317,7 @@ const StocksPage = () => {
               </PopoverTrigger>
               <PopoverContent className="w-48 p-2" align="start">
                 <div className="space-y-1">
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="sm"
                     className={cn(
@@ -327,7 +327,7 @@ const StocksPage = () => {
                     onClick={() => setFilters((prev) => ({ ...prev, base_id: "All bases" }))}
                   >
                     All bases
-                  </Button>
+                  </Button> */}
                   {bases.map((base) => (
                     <Button
                       key={base._id}

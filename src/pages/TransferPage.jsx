@@ -85,6 +85,7 @@ const TransferPage = () => {
     invoiceNumber: "",
     remarks: "",
     transferDate: new Date().toISOString().split("T")[0],
+    fromBase: ""
   })
 
   const fetchTransfers = async () => {
@@ -175,7 +176,7 @@ const TransferPage = () => {
       resetForm()
       fetchTransfers()
     } catch (err) {
-      setError(err.message)
+      // setError(err.message)
       toast(err.message, "destructive");
     }
   }

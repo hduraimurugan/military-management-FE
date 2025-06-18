@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Plus, Edit, Trash2, Package, Calendar, FileText, MapPin, Search, Filter, X } from "lucide-react"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
-import { purchasesAPI } from "../services/api"
+import { inventoryAPI, purchasesAPI } from "../services/api"
 import { useAssetBase } from "../context/AssetBaseContext"
 
 import { Button } from "@/components/ui/button"
@@ -30,12 +30,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
+import { ChevronDown } from 'lucide-react'
+import { cn } from "@/lib/utils"
 import { useAuth } from "../context/AuthContext"
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const PurchasePage = () => {
   const { assets, bases } = useAssetBase()
-  const { user, isAdmin , isLogisticsOfficer } = useAuth()
+  const { user, isAdmin, isLogisticsOfficer } = useAuth()
   const [purchases, setPurchases] = useState([])
   const [filteredPurchases, setFilteredPurchases] = useState([])
   const [loading, setLoading] = useState(true)
@@ -44,6 +49,8 @@ const PurchasePage = () => {
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedPurchase, setSelectedPurchase] = useState(null)
+  const [inventoryData, setInventoryData] = useState([])
+
 
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("")
@@ -57,6 +64,7 @@ const PurchasePage = () => {
     invoiceNumber: "",
     remarks: "",
     purchaseDate: new Date().toISOString().split("T")[0],
+    base: ""
   })
 
   const [pagination, setPagination] = useState({
@@ -99,6 +107,21 @@ const PurchasePage = () => {
     fetchPurchases();
   }, [pagination.page, selectedBaseFilter, selectedAssetFilter, dateFilter]);
 
+  // Fetch inventory for assignment modal
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const data = await inventoryAPI.getMyStock()
+        setInventoryData(data.stocks || [])
+      } catch (err) {
+        console.error("Failed to fetch inventory:", err)
+      }
+    }
+
+    if (showCreateModal) {
+      fetchInventory()
+    }
+  }, [showCreateModal])
 
   const clearFilters = () => {
     setSearchTerm("")
@@ -118,7 +141,8 @@ const PurchasePage = () => {
       resetForm()
       fetchPurchases()
     } catch (err) {
-      setError(err.message)
+      // setError(err.message)
+      toast(err.message, "destructive");
     }
   }
 
@@ -134,7 +158,8 @@ const PurchasePage = () => {
       resetForm()
       fetchPurchases()
     } catch (err) {
-      setError(err.message)
+      // setError(err.message)
+      toast(err.message, "destructive");
     }
   }
 
@@ -253,94 +278,191 @@ const PurchasePage = () => {
         </Card>
       )}
 
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Search & Filters
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search bills..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+      {/* Compact Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-0">
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Search & Filters
+            </CardTitle>
+            {(searchTerm || (selectedAssetFilter && selectedAssetFilter !== "all") || (selectedBaseFilter && selectedBaseFilter !== "all") || dateFilter) && (
+              <Badge variant="secondary" className="text-xs">
+                {[searchTerm, selectedAssetFilter && selectedAssetFilter !== "all", selectedBaseFilter && selectedBaseFilter !== "all", dateFilter].filter(Boolean).length} active
+              </Badge>
+            )}
+          </div>
 
-            <Select value={selectedAssetFilter} onValueChange={setSelectedAssetFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by asset" />
-              </SelectTrigger>
-              <SelectContent>
-                {/* Option 1: Remove the "All assets" option */}
-                {/* {assets.map((asset) => (
-                  <SelectItem key={asset._id} value={asset._id}>
-                    {asset.name}
-                  </SelectItem>
-                ))} */}
+          {(searchTerm || (selectedAssetFilter && selectedAssetFilter !== "all") || (selectedBaseFilter && selectedBaseFilter !== "all") || dateFilter) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="h-8 px-2"
+            >
+              <X className="h-3 w-3 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
 
-                {/* OR Option 2: Use a special value like "all" */}
-                <SelectItem value="all">All assets</SelectItem>
+        {/* Compact Filter Controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Search */}
+          <div className="relative min-w-[200px] flex-1 max-w-xs">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search bills..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
+            />
+          </div>
+
+          <Separator orientation="vertical" className="h-6" />
+
+          {/* Asset Filter */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Package className="h-3 w-3 mr-2" />
+                {selectedAssetFilter && selectedAssetFilter !== "all"
+                  ? getAssetById(selectedAssetFilter)?.name
+                  : "Asset"}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start h-8 text-sm",
+                    (!selectedAssetFilter || selectedAssetFilter === null) && "bg-primary/10 text-primary"
+                  )}
+                  onClick={() => setSelectedAssetFilter(null)}
+                >
+                  All assets
+                </Button>
                 {assets.map((asset) => (
-                  <SelectItem key={asset._id} value={asset._id}>
+                  <Button
+                    key={asset._id}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      selectedAssetFilter === asset._id && "bg-primary/10 text-primary"
+                    )}
+                    onClick={() => setSelectedAssetFilter(asset._id)}
+                  >
                     {asset.name}
-                  </SelectItem>
+                  </Button>
                 ))}
-              </SelectContent>
-            </Select>
+              </div>
+            </PopoverContent>
+          </Popover>
 
-            {isAdmin &&
-              <Select value={selectedBaseFilter} onValueChange={setSelectedBaseFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by base" />
-                </SelectTrigger>
-                <SelectContent>
-                  {/* Option 1: Remove the "All bases" option */}
-                  {/* {bases.map((base) => (
-                    <SelectItem key={base._id} value={base._id}>
-                      {base.name}
-                    </SelectItem>
-                  ))} */}
-
-                  {/* OR Option 2: Use a special value like empty string or "all" */}
-                  <SelectItem value="all">All bases</SelectItem>
+          {/* Base Selector (Admin Only) */}
+          {isAdmin && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <MapPin className="h-3 w-3 mr-2" />
+                  {selectedBaseFilter && selectedBaseFilter !== "all"
+                    ? bases.find((b) => b._id === selectedBaseFilter)?.name
+                    : "Base"}
+                  <ChevronDown className="h-3 w-3 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start">
+                <div className="space-y-1">
+                  {/* <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      (!selectedBaseFilter || selectedBaseFilter === "all") && "bg-primary/10 text-primary"
+                    )}
+                    onClick={() => setSelectedBaseFilter("all")}
+                  >
+                    All bases
+                  </Button> */}
                   {bases.map((base) => (
-                    <SelectItem key={base._id} value={base._id}>
+                    <Button
+                      key={base._id}
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        selectedBaseFilter === base._id && "bg-primary/10 text-primary"
+                      )}
+                      onClick={() => setSelectedBaseFilter(base._id)}
+                    >
                       {base.name}
-                    </SelectItem>
+                    </Button>
                   ))}
-                </SelectContent>
-              </Select>
-            }
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {/* Date Filter */}
+          <div className="flex items-center gap-1">
             <Input
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              placeholder="Filter by date"
-            />
-            <Button variant="outline" onClick={clearFilters} className="flex items-center gap-2">
-              <X className="h-4 w-4" />
-              Clear Filters
-            </Button>
-          </div>
-          {(searchTerm || selectedAssetFilter || dateFilter) && (
-            <div className="mt-4 flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Active filters:</span>
-              {searchTerm && <Badge variant="secondary">Search: {searchTerm}</Badge>}
-              {selectedAssetFilter && (
-                <Badge variant="secondary">Asset: {getAssetById(selectedAssetFilter)?.name}</Badge>
+              className={cn(
+                "h-9 w-auto",
+                dateFilter && "border-primary/50 bg-primary/5"
               )}
-              {dateFilter && <Badge variant="secondary">Date: {formatDate(dateFilter)}</Badge>}
-            </div>
-          )}
+            />
+          </div>
 
-        </CardContent>
+          <Separator orientation="vertical" className="h-6" />
+        </div>
+
+        {/* Active Filters Display */}
+        {(searchTerm || (selectedAssetFilter && selectedAssetFilter !== "all") || (selectedBaseFilter && selectedBaseFilter !== "all") || dateFilter) && (
+          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+            <span className="text-xs text-primary/50 font-medium">Active filters:</span>
+            {searchTerm && (
+              <Badge variant="secondary" className="text-xs">
+                Search: {searchTerm}
+                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
+              </Badge>
+            )}
+            {selectedAssetFilter && selectedAssetFilter !== "all" && (
+              <Badge variant="secondary" className="text-xs">
+                {getAssetById(selectedAssetFilter)?.name}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setSelectedAssetFilter("all")}
+                />
+              </Badge>
+            )}
+            {selectedBaseFilter && selectedBaseFilter !== "all" && (
+              <Badge variant="secondary" className="text-xs">
+                {bases.find((b) => b._id === selectedBaseFilter)?.name}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setSelectedBaseFilter("all")}
+                />
+              </Badge>
+            )}
+            {dateFilter && (
+              <Badge variant="secondary" className="text-xs">
+                Date: {formatDate(dateFilter)}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setDateFilter("")}
+                />
+              </Badge>
+            )}
+          </div>
+        )}
       </Card>
 
       {/* Table */}
@@ -539,7 +661,7 @@ const PurchasePage = () => {
             </div>
 
             {/* Add this section for base selection (admin only) */}
-            {user?.role === "admin" && (
+            {isAdmin && (
               <div className="space-y-2">
                 <Label htmlFor="base">Base</Label>
                 <Select
@@ -550,12 +672,14 @@ const PurchasePage = () => {
                     <SelectValue placeholder="Select base" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All bases</SelectItem>
-                    {bases.map((base) => (
-                      <SelectItem key={base._id} value={base._id}>
-                        {base.name}
-                      </SelectItem>
-                    ))}
+                    {/* <SelectItem value="all">All bases</SelectItem> */}
+                    {bases
+                      .filter((base) => base._id !== user?.base?._id)
+                      .map((base) => (
+                        <SelectItem key={base._id} value={base._id}>
+                          {base.name} - {base.district}, {base.state}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -582,11 +706,18 @@ const PurchasePage = () => {
                           <SelectValue placeholder="Select Asset" />
                         </SelectTrigger>
                         <SelectContent>
-                          {assets.map((asset) => (
-                            <SelectItem key={asset._id} value={asset._id}>
-                              {asset.name} ({asset.category})
-                            </SelectItem>
-                          ))}
+                          {isAdmin
+                            ? assets.map((asset) => (
+                              <SelectItem key={asset._id} value={asset._id}>
+                                {asset.name} ({asset.category})
+                              </SelectItem>
+                            ))
+                            : inventoryData.map((stock) => (
+                              <SelectItem key={stock.asset._id} value={stock.asset._id}>
+                                {stock.asset.name} (Available: {stock.quantity})
+                              </SelectItem>
+                            ))
+                          }
                         </SelectContent>
                       </Select>
                     </div>

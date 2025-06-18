@@ -44,6 +44,7 @@ const ExpendituresPage = () => {
     currentPage: 1,
     limit: 10,
     totalPages: 0,
+    base: ""
   })
 
   const [inventoryData, setInventoryData] = useState([])

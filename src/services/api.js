@@ -187,8 +187,17 @@ export const purchasesAPI = {
       credentials: "include",
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error("Failed to create purchase bill");
-    return response.json();
+    // if (!response.ok) throw new Error("Failed to create purchase bill");
+    // return response.json();
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to create purchase bill";
+      throw new Error(errorMessage);
+    }
+
+    return result;
   },
 
   // ✏️ Update a purchase bill by ID
@@ -201,8 +210,17 @@ export const purchasesAPI = {
       credentials: "include",
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error("Failed to update purchase bill");
-    return response.json();
+    // if (!response.ok) throw new Error("Failed to update purchase bill");
+    // return response.json();
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to update purchase bill";
+      throw new Error(errorMessage);
+    }
+
+    return result;
   },
 
   // ❌ Delete a purchase bill by ID
@@ -351,7 +369,7 @@ export const expenditureAPI = {
   },
 
   // 🔄 Mark assigned assets as expended
-  markAssignedAsExpended: async (data,id) => {
+  markAssignedAsExpended: async (data, id) => {
     const response = await fetch(`${API_BASE_URL}/api/expend/markAssignedAsExpended/${id}`, {
       method: "POST",
       headers: {

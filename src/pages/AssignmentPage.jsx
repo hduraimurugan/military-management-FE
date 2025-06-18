@@ -70,6 +70,7 @@ const AssignmentPage = () => {
     items: [{ asset: "", quantity: 1 }],
     remarks: "",
     assignDate: new Date(),
+    base: ""
   })
 
   const [expendForm, setExpendForm] = useState({
@@ -310,7 +311,7 @@ const AssignmentPage = () => {
             </Badge>
           )}
           <Badge variant="outline">{totalAssignments} Total</Badge>
-          
+
           <Button variant="outline" asChild>
             <Link to="/stocks">
               <Package className="mr-2 h-4 w-4" />
@@ -342,7 +343,32 @@ const AssignmentPage = () => {
                     />
                   </div>
 
-                  <div >
+                  {/* Add this section for base selection (admin only) */}
+                  {isAdmin && (
+                    <div className="space-y-2">
+                      <Label htmlFor="base">Base</Label>
+                      <Select
+                        value={assignForm?.base || ""}
+                        onValueChange={(value) => setAssignForm((prev) => ({ ...prev, base: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select base" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/* <SelectItem value="all">All bases</SelectItem> */}
+                          {bases
+                            .filter((base) => base._id !== user?.base?._id)
+                            .map((base) => (
+                              <SelectItem key={base._id} value={base._id}>
+                                {base.name} - {base.district}, {base.state}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  <div>
                     <Label>Items to Assign</Label>
                     {assignForm.items.map((item, index) => (
                       <div key={index} className="flex gap-2 mt-2">

@@ -104,7 +104,7 @@ export const Layout = () => {
                 <FaPersonMilitaryRifle className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="font-semibold text-lg hidden sm:inline-block">
-                Military Base 
+                Military Base :
                 {isAdmin ? "Management" : user.baseName}
               </span>
             </Link>
@@ -116,14 +116,18 @@ export const Layout = () => {
                   <FaPersonMilitaryRifle className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <span className="font-semibold text-lg">
-                  Military Asset
+                  Military Asset :
                   {/* {isAdmin ? "Management" : user.baseName} */}
                 </span>
               </Link>
             </div>
 
+            <Badge variant="outline" className={getRoleColor(user?.role) + " md:block hidden"}>
+              {getRoleLabel(user?.role)}
+            </Badge>
+
             {/* Location */}
-            <Badge
+            {/* <Badge
               variant="outline"
               className="flex items-center gap-2 bg-primary/10 border-primary/20 text-primary rounded-md px-3 py-1"
             >
@@ -139,7 +143,7 @@ export const Layout = () => {
                   {isAdmin ? "India" : user.state}
                 </span>
               </div>
-            </Badge>
+            </Badge> */}
           </div>
 
           {/* Center section with search */}
@@ -161,9 +165,9 @@ export const Layout = () => {
           {/* Right side actions */}
           <div className="flex items-center justify-end gap-2">
             {/* Location */}
-            {/* <Badge
+            <Badge
               variant="outline"
-              className="flex items-center gap-2 bg-primary/10 border-primary/20 text-primary rounded-md px-3 py-1"
+              className="md:flex hidden items-center gap-2 bg-primary/10 border-primary/20 text-primary rounded-md px-3 py-1"
             >
               <IoLocationSharp className="text-primary text-lg" />
               <div className="flex flex-row gap-1 leading-tight text-xs">
@@ -177,7 +181,7 @@ export const Layout = () => {
                   {isAdmin ? "India" : user.state}
                 </span>
               </div>
-            </Badge> */}
+            </Badge>
 
             {/* Theme Toggle */}
             <Button
