@@ -266,3 +266,49 @@ export const inventoryAPI = {
     return response.json();
   },
 };
+
+// Transfers API
+export const transfersAPI = {
+  // 🚚 Create a new transfer bill
+  create: async (data) => {
+    const response = await fetch(`${API_BASE_URL}/api/transfers/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Failed to create transfer bill");
+    return response.json();
+  },
+
+  // ❌ Delete a transfer bill by ID
+  delete: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/api/transfers/delete/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error("Failed to delete transfer bill");
+    return response.json();
+  },
+
+  // 📃 Get all transfer bills (for user's base or all depending on role)
+  getAll: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/api/transfers/getMy?${query}`, {
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error("Failed to fetch transfer bills");
+    return response.json();
+  },
+
+  // 🔍 Get a single transfer bill by ID
+  getById: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/api/transfers/get/${id}`, {
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error("Failed to fetch transfer bill");
+    return response.json();
+  },
+};

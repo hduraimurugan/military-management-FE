@@ -253,26 +253,27 @@ const StocksPage = () => {
                 </SelectContent>
               </Select>
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Bases</label>
-              <Select
-                value={filters.base_id}
-                onValueChange={(value) => setFilters((prev) => ({ ...prev, base_id: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="All bases" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All bases">All categories</SelectItem>
-                  {bases.map((base) => (
-                    <SelectItem key={base._id} value={base._id}>
-                      {base.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {user.role === "admin" &&
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Bases</label>
+                <Select
+                  value={filters.base_id}
+                  onValueChange={(value) => setFilters((prev) => ({ ...prev, base_id: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All bases" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All bases">All categories</SelectItem>
+                    {bases.map((base) => (
+                      <SelectItem key={base._id} value={base._id}>
+                        {base.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            }
 
             <div className="space-y-2 hidden">
               <label className="text-sm font-medium">Quantity Range</label>
@@ -377,15 +378,21 @@ const StocksPage = () => {
                 <TableRow>
                   <TableHead className="w-[50px]">Alert</TableHead>
                   <TableHead>
-                    <Button variant="ghost" onClick={() => handleSort("asset")} className="h-auto p-0 font-semibold">
+                    <Button 
+                    variant="ghost" 
+                    // onClick={() => handleSort("asset")} 
+                    className="h-auto p-0 font-semibold">
                       Asset
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
+                      {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                     </Button>
                   </TableHead>
                   <TableHead>Category</TableHead>
                   {/* <TableHead>Location</TableHead> */}
                   <TableHead>
-                    <Button variant="ghost" onClick={() => handleSort("quantity")} className="h-auto p-0 font-semibold">
+                    <Button 
+                    variant="ghost" 
+                    onClick={() => handleSort("quantity")} 
+                    className="h-auto p-0 font-semibold">
                       Quantity
                       <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
@@ -393,23 +400,29 @@ const StocksPage = () => {
                   <TableHead>
                     <Button
                       variant="ghost"
-                      onClick={() => handleSort("purchased")}
+                      // onClick={() => handleSort("purchased")}
                       className="h-auto p-0 font-semibold"
                     >
                       Purchased
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
+                      {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                     </Button>
                   </TableHead>
                   <TableHead>
-                    <Button variant="ghost" onClick={() => handleSort("expended")} className="h-auto p-0 font-semibold">
+                    <Button
+                      variant="ghost"
+                      // onClick={() => handleSort("expended")} 
+                      className="h-auto p-0 font-semibold">
                       Expended
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
+                      {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                     </Button>
                   </TableHead>
                   <TableHead>
-                    <Button variant="ghost" onClick={() => handleSort("assigned")} className="h-auto p-0 font-semibold">
+                    <Button 
+                    variant="ghost" 
+                    // onClick={() => handleSort("assigned")} 
+                    className="h-auto p-0 font-semibold">
                       Assigned
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
+                      {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
                     </Button>
                   </TableHead>
                   <TableHead>Transferred Out</TableHead>
@@ -435,16 +448,16 @@ const StocksPage = () => {
                     {/* <TableCell>
                       <Badge variant="secondary">{item.asset.category}</Badge>
                     </TableCell> */}
-                    <TableCell>
+                    <TableCell className="text-center">
                       <Badge variant={item.quantity < 10 ? "destructive" : "default"} className="font-mono">
                         {item.quantity}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-mono">{item.purchased}</TableCell>
-                    <TableCell className="font-mono">{item.expended}</TableCell>
-                    <TableCell className="font-mono">{item.assigned}</TableCell>
-                    <TableCell className="font-mono">{item.transferredOut}</TableCell>
-                    <TableCell className="font-mono">{item.transferredIn}</TableCell>
+                    <TableCell className="font-mono text-center">{item.purchased}</TableCell>
+                    <TableCell className="font-mono text-center">{item.expended}</TableCell>
+                    <TableCell className="font-mono text-center">{item.assigned}</TableCell>
+                    <TableCell className="font-mono text-center">{item.transferredOut}</TableCell>
+                    <TableCell className="font-mono text-center">{item.transferredIn}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {format(new Date(item?.updatedAt), "MMM dd, yyyy")}
                     </TableCell>

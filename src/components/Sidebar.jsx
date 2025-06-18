@@ -24,7 +24,8 @@ import {
   MessageSquare,
   Calendar,
   HelpCircle,
-  ChevronRight
+  ChevronRight,
+  LucideNotebookText
 } from 'lucide-react';
 import { MdAssignmentTurnedIn, MdOutlineAssignmentTurnedIn, MdOutlineInventory2 } from 'react-icons/md';
 import { FaUsers } from 'react-icons/fa6';
@@ -69,6 +70,12 @@ export const Sidebar = ({ pageTitle }) => {
       name: 'Assignments Page',
       path: '/assignment',
       icon: <MdOutlineAssignmentTurnedIn className="h-5 w-5" />,
+      roles: ['admin', 'base_commander']
+    },
+    {
+      name: 'Expend Page',
+      path: '/expend',
+      icon: <LucideNotebookText className="h-5 w-5" />,
       roles: ['admin', 'base_commander']
     },
     {
