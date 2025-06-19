@@ -32,8 +32,10 @@ import { IoMdMove } from "react-icons/io";
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { movementAPI } from "../services/api"
+import { useAssetBase } from "../context/AssetBaseContext"
 
 const ReportsPage = () => {
+  const { assets } = useAssetBase()
   const [searchTerm, setSearchTerm] = useState("")
   const [movementData, setMovementData] = useState([])
   const [loading, setLoading] = useState(true)
@@ -48,6 +50,8 @@ const ReportsPage = () => {
   // Carousel state
   const [currentSlide, setCurrentSlide] = useState(0)
   const [cardsPerView, setCardsPerView] = useState(4)
+
+  const [selectedAssetFilter, setSelectedAssetFilter] = useState("")
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -75,7 +79,7 @@ const ReportsPage = () => {
           page: pagination.page,
           limit: pagination.limit,
           actionType: filters.actionType !== "All types" ? filters.actionType : undefined,
-          assetId: filters.assetId || undefined,
+          assetId: selectedAssetFilter || undefined,
           baseId: filters.baseId || undefined,
           dateFrom: filters.dateFrom ? format(filters.dateFrom, "yyyy-MM-dd") : undefined,
           dateTo: filters.dateTo ? format(filters.dateTo, "yyyy-MM-dd") : undefined,
@@ -105,7 +109,7 @@ const ReportsPage = () => {
     }
 
     fetchMovementData()
-  }, [filters, sortConfig, pagination.page, pagination.limit, searchTerm])
+  }, [filters, sortConfig, selectedAssetFilter, pagination.page, pagination.limit, searchTerm])
 
   const handleSort = (key) => {
     let direction = "asc"
@@ -127,6 +131,7 @@ const ReportsPage = () => {
     })
     setSortConfig({ key: "date", direction: "desc" })
     setPagination((prev) => ({ ...prev, page: 1 }))
+    setSelectedAssetFilter("")
   }
 
   // Calculate stats from current data
@@ -233,8 +238,6 @@ const ReportsPage = () => {
 
   const totalSlides = Math.ceil(statsCards.length / cardsPerView);
 
-
-
   // Helper function to get active filters count
   const getActiveFiltersCount = () => {
     let count = 0
@@ -245,6 +248,7 @@ const ReportsPage = () => {
     if (filters.dateFrom) count++
     if (filters.dateTo) count++
     if (filters.performedBy) count++
+    if (selectedAssetFilter) count++
     return count
   }
 
@@ -260,6 +264,11 @@ const ReportsPage = () => {
     assignment: "default",   // gray/neutral
     expenditure: "destructive", // red
   };
+
+  const getAssetById = (id) => {
+    return assets.find((asset) => asset._id === id)
+  }
+
 
 
   if (loading) {
@@ -305,7 +314,7 @@ const ReportsPage = () => {
       </div>
 
       {/* Stats Cards Carousel */}
-      <div className="relative overflow-hidden rounded-xl bg-primary/10 p-3">
+      <div className="hidden relative overflow-hidden rounded-xl bg-primary/10 p-3">
         <div className="relative">
           {/* Carousel Container */}
           <div
@@ -384,6 +393,52 @@ const ReportsPage = () => {
 
           <Separator orientation="vertical" className="h-6" />
 
+          {/* Asset Filter */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Package className="h-3 w-3 mr-2" />
+                {selectedAssetFilter && selectedAssetFilter !== "all"
+                  ? getAssetById(selectedAssetFilter)?.name
+                  : "Asset"}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1 max-h-60 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                {/* All Assets Option */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start h-8 text-sm",
+                    (!selectedAssetFilter || selectedAssetFilter === null) && "bg-primary/10 text-primary"
+                  )}
+                  onClick={() => setSelectedAssetFilter(null)}
+                >
+                  All assets
+                </Button>
+
+                {/* Asset Buttons */}
+                {assets.map((asset) => (
+                  <Button
+                    key={asset._id}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      selectedAssetFilter === asset._id && "bg-primary/10 text-primary"
+                    )}
+                    onClick={() => setSelectedAssetFilter(asset._id)}
+                  >
+                    {asset.name}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+
+          </Popover>
+
           {/* Action Type */}
           <Popover>
             <PopoverTrigger asChild>
@@ -394,14 +449,14 @@ const ReportsPage = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-48 p-2" align="start">
-              <div className="space-y-1">
-                {["All types", "assignment", "expenditure"].map((type) => (
+              <div className="space-y-1 capitalize">
+                {["All types", "purchase", "transfer" , "assignment", "expenditure"].map((type) => (
                   <Button
                     key={type}
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "w-full justify-start h-8 text-sm",
+                      "w-full justify-start h-8 text-sm ",
                       filters.actionType === type && "bg-primary/10 text-primary",
                     )}
                     onClick={() => setFilters((prev) => ({ ...prev, actionType: type }))}

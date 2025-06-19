@@ -64,6 +64,8 @@ const AssignmentPage = () => {
   const [selectedAssignment, setSelectedAssignment] = useState(null)
   const [selectedItems, setSelectedItems] = useState([])
 
+  const [selectedAssetFilter, setSelectedAssetFilter] = useState("")
+
   // Form states
   const [assignForm, setAssignForm] = useState({
     assignedTo: "",
@@ -106,6 +108,7 @@ const AssignmentPage = () => {
         sortField: sortConfig.key,
         sortDirection: sortConfig.direction,
         baseId: filters.base_id,
+        assetId: selectedAssetFilter || undefined
       }
 
       const queryParams = Object.fromEntries(Object.entries(params).filter(([_, value]) => value !== undefined))
@@ -123,7 +126,7 @@ const AssignmentPage = () => {
   // Fetch assignments data
   useEffect(() => {
     fetchAssignmentData()
-  }, [filters, sortConfig])
+  }, [filters, sortConfig, selectedAssetFilter])
 
   // Fetch inventory for assignment modal
   useEffect(() => {
@@ -163,6 +166,7 @@ const AssignmentPage = () => {
       base_id: user?.role === "admin" && bases.length > 0 ? bases[0]._id : "",
     })
     setSortConfig({ key: null, direction: "asc" })
+    setSelectedAssetFilter("")
   }
 
   // Handle assignment creation
@@ -251,8 +255,8 @@ const AssignmentPage = () => {
 
   // Calculate stats
   const totalAssignments = assignmentData.length
-  const activeAssignments = assignmentData.filter((a) => !a.isExpended).length
   const expendedAssignments = assignmentData.filter((a) => a.isExpended).length
+  const activeAssignments = assignmentData.filter((a) => !a.isExpended).length
   const totalItemsAssigned = assignmentData.reduce(
     (sum, assignment) => sum + assignment.items.reduce((itemSum, item) => itemSum + item.quantity, 0),
     0,
@@ -267,6 +271,11 @@ const AssignmentPage = () => {
     if (filters.dateTo) count++
     return count
   }
+
+  const getAssetById = (id) => {
+    return assets.find((asset) => asset._id === id)
+  }
+
 
   const activeFiltersCount = getActiveFiltersCount()
 
@@ -535,6 +544,52 @@ const AssignmentPage = () => {
           </div> */}
 
           <Separator orientation="vertical" className="h-6" />
+
+          {/* Asset Filter */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Package className="h-3 w-3 mr-2" />
+                {selectedAssetFilter && selectedAssetFilter !== "all"
+                  ? getAssetById(selectedAssetFilter)?.name
+                  : "Asset"}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1 max-h-60 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                {/* All Assets Option */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start h-8 text-sm",
+                    (!selectedAssetFilter || selectedAssetFilter === null) && "bg-primary/10 text-primary"
+                  )}
+                  onClick={() => setSelectedAssetFilter(null)}
+                >
+                  All assets
+                </Button>
+
+                {/* Asset Buttons */}
+                {assets.map((asset) => (
+                  <Button
+                    key={asset._id}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      selectedAssetFilter === asset._id && "bg-primary/10 text-primary"
+                    )}
+                    onClick={() => setSelectedAssetFilter(asset._id)}
+                  >
+                    {asset.name}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+
+          </Popover>
 
           {/* Status */}
           <Popover>

@@ -323,19 +323,19 @@ const ExpendituresPage = () => {
               (selectedBaseFilter && selectedBaseFilter !== "all") ||
               expendedByFilter ||
               dateFilter) && (
-              <Badge variant="secondary" className="text-xs">
-                {
-                  [
-                    searchTerm,
-                    selectedAssetFilter && selectedAssetFilter !== "all",
-                    selectedBaseFilter && selectedBaseFilter !== "all",
-                    expendedByFilter,
-                    dateFilter,
-                  ].filter(Boolean).length
-                }{" "}
-                active
-              </Badge>
-            )}
+                <Badge variant="secondary" className="text-xs">
+                  {
+                    [
+                      searchTerm,
+                      selectedAssetFilter && selectedAssetFilter !== "all",
+                      selectedBaseFilter && selectedBaseFilter !== "all",
+                      expendedByFilter,
+                      dateFilter,
+                    ].filter(Boolean).length
+                  }{" "}
+                  active
+                </Badge>
+              )}
           </div>
 
           {(searchTerm ||
@@ -343,11 +343,11 @@ const ExpendituresPage = () => {
             (selectedBaseFilter && selectedBaseFilter !== "all") ||
             expendedByFilter ||
             dateFilter) && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2">
-              <X className="h-3 w-3 mr-1" />
-              Clear
-            </Button>
-          )}
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2">
+                <X className="h-3 w-3 mr-1" />
+                Clear
+              </Button>
+            )}
         </div>
 
         {/* Compact Filter Controls */}
@@ -377,18 +377,21 @@ const ExpendituresPage = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-48 p-2" align="start">
-              <div className="space-y-1">
+              <div className="space-y-1 max-h-60 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                {/* All Assets Option */}
                 <Button
                   variant="ghost"
                   size="sm"
                   className={cn(
                     "w-full justify-start h-8 text-sm",
-                    (!selectedAssetFilter || selectedAssetFilter === "") && "bg-primary/10 text-primary",
+                    (!selectedAssetFilter || selectedAssetFilter === null) && "bg-primary/10 text-primary"
                   )}
-                  onClick={() => setSelectedAssetFilter("")}
+                  onClick={() => setSelectedAssetFilter(null)}
                 >
                   All assets
                 </Button>
+
+                {/* Asset Buttons */}
                 {assets.map((asset) => (
                   <Button
                     key={asset._id}
@@ -396,7 +399,7 @@ const ExpendituresPage = () => {
                     size="sm"
                     className={cn(
                       "w-full justify-start h-8 text-sm",
-                      selectedAssetFilter === asset._id && "bg-primary/10 text-primary",
+                      selectedAssetFilter === asset._id && "bg-primary/10 text-primary"
                     )}
                     onClick={() => setSelectedAssetFilter(asset._id)}
                   >
@@ -405,6 +408,7 @@ const ExpendituresPage = () => {
                 ))}
               </div>
             </PopoverContent>
+
           </Popover>
 
           {/* Base Filter (Admin Only) */}
@@ -462,29 +466,29 @@ const ExpendituresPage = () => {
           </div> */}
 
           {/* Date Filter new */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                      "h-9 ",
-                      dateFilter && "border-primary/50 bg-primary/5",
-                    )}
-                  >
-                    <CalendarIcon className="h-3 w-3 mr-2" />
-                    {dateFilter ? format(dateFilter, "MMM dd") : "Select Date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={dateFilter}
-                    onSelect={(date) => setDateFilter(date)}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-9 ",
+                  dateFilter && "border-primary/50 bg-primary/5",
+                )}
+              >
+                <CalendarIcon className="h-3 w-3 mr-2" />
+                {dateFilter ? format(dateFilter, "MMM dd") : "Select Date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={dateFilter}
+                onSelect={(date) => setDateFilter(date)}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
 
           {/* Date Filter */}
           {/* <div className="flex items-center gap-1">
@@ -505,40 +509,40 @@ const ExpendituresPage = () => {
           (selectedBaseFilter && selectedBaseFilter !== "all") ||
           expendedByFilter ||
           dateFilter) && (
-          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
-            <span className="text-xs text-primary/50 font-medium">Active filters:</span>
-            {searchTerm && (
-              <Badge variant="secondary" className="text-xs">
-                Search: {searchTerm}
-                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
-              </Badge>
-            )}
-            {selectedAssetFilter && selectedAssetFilter !== "all" && (
-              <Badge variant="secondary" className="text-xs">
-                {getAssetById(selectedAssetFilter)?.name}
-                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedAssetFilter("all")} />
-              </Badge>
-            )}
-            {selectedBaseFilter && selectedBaseFilter !== "all" && (
-              <Badge variant="secondary" className="text-xs">
-                {bases.find((b) => b._id === selectedBaseFilter)?.name}
-                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedBaseFilter("all")} />
-              </Badge>
-            )}
-            {expendedByFilter && (
-              <Badge variant="secondary" className="text-xs">
-                By: {expendedByFilter}
-                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setExpendedByFilter("")} />
-              </Badge>
-            )}
-            {dateFilter && (
-              <Badge variant="secondary" className="text-xs">
-                Date: {formatDate(dateFilter)}
-                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setDateFilter("")} />
-              </Badge>
-            )}
-          </div>
-        )}
+            <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+              <span className="text-xs text-primary/50 font-medium">Active filters:</span>
+              {searchTerm && (
+                <Badge variant="secondary" className="text-xs">
+                  Search: {searchTerm}
+                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
+                </Badge>
+              )}
+              {selectedAssetFilter && selectedAssetFilter !== "all" && (
+                <Badge variant="secondary" className="text-xs">
+                  {getAssetById(selectedAssetFilter)?.name}
+                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedAssetFilter("all")} />
+                </Badge>
+              )}
+              {selectedBaseFilter && selectedBaseFilter !== "all" && (
+                <Badge variant="secondary" className="text-xs">
+                  {bases.find((b) => b._id === selectedBaseFilter)?.name}
+                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedBaseFilter("all")} />
+                </Badge>
+              )}
+              {expendedByFilter && (
+                <Badge variant="secondary" className="text-xs">
+                  By: {expendedByFilter}
+                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setExpendedByFilter("")} />
+                </Badge>
+              )}
+              {dateFilter && (
+                <Badge variant="secondary" className="text-xs">
+                  Date: {formatDate(dateFilter)}
+                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setDateFilter("")} />
+                </Badge>
+              )}
+            </div>
+          )}
       </Card>
 
       {/* Expenditures Table */}
@@ -793,15 +797,15 @@ const ExpendituresPage = () => {
                         <SelectContent>
                           {isAdmin
                             ? assets.map((asset) => (
-                                <SelectItem key={asset._id} value={asset._id}>
-                                  {asset.name} ({asset.category})
-                                </SelectItem>
-                              ))
+                              <SelectItem key={asset._id} value={asset._id}>
+                                {asset.name} ({asset.category})
+                              </SelectItem>
+                            ))
                             : inventoryData.map((stock) => (
-                                <SelectItem key={stock.asset._id} value={stock.asset._id}>
-                                  {stock.asset.name} (Available: {stock.quantity})
-                                </SelectItem>
-                              ))}
+                              <SelectItem key={stock.asset._id} value={stock.asset._id}>
+                                {stock.asset.name} (Available: {stock.quantity})
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                     </div>

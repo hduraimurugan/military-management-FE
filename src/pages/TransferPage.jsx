@@ -384,18 +384,21 @@ const TransferPage = () => {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-48 p-2" align="start">
-                  <div className="space-y-1">
+                  <div className="space-y-1 max-h-60 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                    {/* All Assets Option */}
                     <Button
                       variant="ghost"
                       size="sm"
                       className={cn(
                         "w-full justify-start h-8 text-sm",
-                        (!selectedAssetFilter || selectedAssetFilter === "all") && "bg-primary/10 text-primary",
+                        (!selectedAssetFilter || selectedAssetFilter === null) && "bg-primary/10 text-primary"
                       )}
-                      onClick={() => setSelectedAssetFilter("all")}
+                      onClick={() => setSelectedAssetFilter(null)}
                     >
                       All assets
                     </Button>
+
+                    {/* Asset Buttons */}
                     {assets.map((asset) => (
                       <Button
                         key={asset._id}
@@ -403,7 +406,7 @@ const TransferPage = () => {
                         size="sm"
                         className={cn(
                           "w-full justify-start h-8 text-sm",
-                          selectedAssetFilter === asset._id && "bg-primary/10 text-primary",
+                          selectedAssetFilter === asset._id && "bg-primary/10 text-primary"
                         )}
                         onClick={() => setSelectedAssetFilter(asset._id)}
                       >
@@ -412,6 +415,7 @@ const TransferPage = () => {
                     ))}
                   </div>
                 </PopoverContent>
+
               </Popover>
 
               {/* Source Base Filter (Admin Only) */}
@@ -728,18 +732,21 @@ const TransferPage = () => {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-48 p-2" align="start">
-                  <div className="space-y-1">
+                  <div className="space-y-1 max-h-60 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                    {/* All Assets Option */}
                     <Button
                       variant="ghost"
                       size="sm"
                       className={cn(
                         "w-full justify-start h-8 text-sm",
-                        (!selectedAssetFilter || selectedAssetFilter === "all") && "bg-primary/10 text-primary",
+                        (!selectedAssetFilter || selectedAssetFilter === null) && "bg-primary/10 text-primary"
                       )}
-                      onClick={() => setSelectedAssetFilter("all")}
+                      onClick={() => setSelectedAssetFilter(null)}
                     >
                       All assets
                     </Button>
+
+                    {/* Asset Buttons */}
                     {assets.map((asset) => (
                       <Button
                         key={asset._id}
@@ -747,7 +754,7 @@ const TransferPage = () => {
                         size="sm"
                         className={cn(
                           "w-full justify-start h-8 text-sm",
-                          selectedAssetFilter === asset._id && "bg-primary/10 text-primary",
+                          selectedAssetFilter === asset._id && "bg-primary/10 text-primary"
                         )}
                         onClick={() => setSelectedAssetFilter(asset._id)}
                       >
@@ -756,6 +763,7 @@ const TransferPage = () => {
                     ))}
                   </div>
                 </PopoverContent>
+
               </Popover>
 
               {/* Source Base Filter */}

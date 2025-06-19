@@ -338,7 +338,8 @@ const PurchasePage = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-48 p-2" align="start">
-              <div className="space-y-1 overflow-sccroll">
+              <div className="space-y-1 max-h-60 overflow-y-auto" style={{scrollbarWidth : "none"}}>
+                {/* All Assets Option */}
                 <Button
                   variant="ghost"
                   size="sm"
@@ -350,6 +351,8 @@ const PurchasePage = () => {
                 >
                   All assets
                 </Button>
+
+                {/* Asset Buttons */}
                 {assets.map((asset) => (
                   <Button
                     key={asset._id}
@@ -366,6 +369,7 @@ const PurchasePage = () => {
                 ))}
               </div>
             </PopoverContent>
+
           </Popover>
 
           {/* Base Selector (Admin Only) */}
