@@ -49,6 +49,7 @@ const DashboardPage = () => {
 
   // Filter states
   const [filters, setFilters] = useState({
+    date: Date.now(),
     dateFrom: null,
     dateTo: null,
     category: "All categories",
@@ -62,6 +63,7 @@ const DashboardPage = () => {
         setLoading(true)
 
         const params = {
+          date: filters.date ? format(filters.date, "yyyy-MM-dd") : undefined,
           dateFrom: filters.dateFrom ? format(filters.dateFrom, "yyyy-MM-dd") : undefined,
           dateTo: filters.dateTo ? format(filters.dateTo, "yyyy-MM-dd") : undefined,
           category: filters.category !== "All categories" ? filters.category : undefined,
@@ -283,23 +285,23 @@ const DashboardPage = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className={cn("h-9", filters.dateFrom && "border-primary/50 bg-primary/5")}
+                  className={cn("h-9", filters.date && "border-primary/50 bg-primary/5")}
                 >
                   <CalendarIcon className="h-3 w-3 mr-2" />
-                  {filters.dateFrom ? format(filters.dateFrom, "MMM dd") : "From"}
+                  {filters.date ? format(filters.date, "MMM dd") : "As on Date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
-                  selected={filters.dateFrom}
-                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  selected={filters.date}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, date: date }))}
                   initialFocus
                 />
               </PopoverContent>
             </Popover>
 
-            <span className="text-primary/50 text-sm">to</span>
+            {/* <span className="text-primary/50 text-sm">to</span>
 
             <Popover>
               <PopoverTrigger asChild>
@@ -320,7 +322,7 @@ const DashboardPage = () => {
                   initialFocus
                 />
               </PopoverContent>
-            </Popover>
+            </Popover> */}
           </div>
         </div>
       </Card>
@@ -507,21 +509,31 @@ const DashboardPage = () => {
           </DialogHeader>
           {selectedMovement && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm flex items-center gap-2">
-                      <ShoppingCart className="h-4 w-4 text-green-600" />
-                      Purchases
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-green-600">
-                      +{selectedMovement.purchases?.toLocaleString() || 0}
-                    </div>
-                  </CardContent>
-                </Card>
 
+              {selectedMovement.asset &&
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Badge variant="default" className="text-sm">
+                    {selectedMovement.asset.name}
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground">
+                    {selectedMovement.asset.category}
+                  </Badge>
+                </div>}
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <ShoppingCart className="h-4 w-4 text-green-600" />
+                    Purchases
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">
+                    +{selectedMovement.purchases?.toLocaleString() || 0}
+                  </div>
+                </CardContent>
+              </Card>
+              <div className="grid grid-cols-2 gap-4">
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
@@ -535,22 +547,21 @@ const DashboardPage = () => {
                     </div>
                   </CardContent>
                 </Card>
+
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Send className="h-4 w-4 text-red-600" />
+                      Transfers Out
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-red-600">
+                      -{selectedMovement.transfersOut?.toLocaleString() || 0}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Send className="h-4 w-4 text-red-600" />
-                    Transfers Out
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-red-600">
-                    -{selectedMovement.transfersOut?.toLocaleString() || 0}
-                  </div>
-                </CardContent>
-              </Card>
-
               <Separator />
 
               <Card className="bg-primary/5">

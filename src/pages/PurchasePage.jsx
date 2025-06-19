@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Plus, Edit, Trash2, Package, Calendar, FileText, MapPin, Search, Filter, X } from "lucide-react"
+import { Plus, Edit, Trash2, Package, FileText, MapPin, Search, Filter, X, CalendarIcon } from "lucide-react"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { inventoryAPI, purchasesAPI } from "../services/api"
 import { useAssetBase } from "../context/AssetBaseContext"
@@ -37,6 +37,9 @@ import { cn } from "@/lib/utils"
 import { useAuth } from "../context/AuthContext"
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar"
+import { BiPurchaseTag } from "react-icons/bi";
 
 const PurchasePage = () => {
   const { assets, bases } = useAssetBase()
@@ -56,7 +59,7 @@ const PurchasePage = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedAssetFilter, setSelectedAssetFilter] = useState("")
   const [selectedBaseFilter, setSelectedBaseFilter] = useState(isAdmin && bases.length > 0 ? bases[0]._id : "");
-  const [dateFilter, setDateFilter] = useState("")
+  const [dateFilter, setDateFilter] = useState(null)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -250,7 +253,7 @@ const PurchasePage = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Package className="h-8 w-8" />
+            <BiPurchaseTag className="h-8 w-8" />
             Purchase Bills
           </h1>
           <p className="text-muted-foreground mt-1">Manage your purchase bills and inventory records</p>
@@ -286,7 +289,7 @@ const PurchasePage = () => {
           <div className="flex items-center gap-2">
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
-              Search & Filters
+              Filters
             </CardTitle>
             {(searchTerm || (selectedAssetFilter && selectedAssetFilter !== "all") || (selectedBaseFilter && selectedBaseFilter !== "all") || dateFilter) && (
               <Badge variant="secondary" className="text-xs">
@@ -311,7 +314,7 @@ const PurchasePage = () => {
         {/* Compact Filter Controls */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Search */}
-          <div className="relative min-w-[200px] flex-1 max-w-xs">
+          {/* <div className="relative min-w-[200px] flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Search bills..."
@@ -319,7 +322,7 @@ const PurchasePage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
             />
-          </div>
+          </div> */}
 
           <Separator orientation="vertical" className="h-6" />
 
@@ -335,7 +338,7 @@ const PurchasePage = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-48 p-2" align="start">
-              <div className="space-y-1">
+              <div className="space-y-1 overflow-sccroll">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -409,8 +412,33 @@ const PurchasePage = () => {
             </Popover>
           )}
 
+          {/* Date Filter new */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-9 ",
+                  dateFilter && "border-primary/50 bg-primary/5",
+                )}
+              >
+                <CalendarIcon className="h-3 w-3 mr-2" />
+                {dateFilter ? format(dateFilter, "MMM dd") : "Select Date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={dateFilter}
+                onSelect={(date) => setDateFilter(date)}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+
           {/* Date Filter */}
-          <div className="flex items-center gap-1">
+          <div className="hidden flex items-center gap-1">
             <Input
               type="date"
               value={dateFilter}
@@ -510,7 +538,7 @@ const PurchasePage = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                       <span>{formatDate(purchase.purchaseDate)}</span>
                     </div>
                   </TableCell>

@@ -1,12 +1,10 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import {
   Plus,
   Eye,
   Trash2,
   DollarSign,
-  Calendar,
+  CalendarIcon,
   FileText,
   MapPin,
   Search,
@@ -53,6 +51,8 @@ import { useAuth } from "../context/AuthContext"
 import { toast } from "sonner"
 import { getRoleColor, getRoleLabel } from "../utils/roleColorLabel.js"
 import { Link } from "react-router-dom"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
 
 const ExpendituresPage = () => {
   const { assets, bases } = useAssetBase()
@@ -316,7 +316,7 @@ const ExpendituresPage = () => {
           <div className="flex items-center gap-2">
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
-              Search & Filters
+              Filters
             </CardTitle>
             {(searchTerm ||
               (selectedAssetFilter && selectedAssetFilter !== "all") ||
@@ -353,7 +353,7 @@ const ExpendituresPage = () => {
         {/* Compact Filter Controls */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Search */}
-          <div className="relative min-w-[200px] flex-1 max-w-xs">
+          {/* <div className="relative min-w-[200px] flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Search expenditures..."
@@ -361,7 +361,7 @@ const ExpendituresPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
             />
-          </div>
+          </div> */}
 
           <Separator orientation="vertical" className="h-6" />
 
@@ -452,24 +452,49 @@ const ExpendituresPage = () => {
           )}
 
           {/* Expended By Filter */}
-          <div className="min-w-[150px]">
+          {/* <div className="min-w-[150px]">
             <Input
               placeholder="Expended by..."
               value={expendedByFilter}
               onChange={(e) => setExpendedByFilter(e.target.value)}
               className="h-9"
             />
-          </div>
+          </div> */}
+
+          {/* Date Filter new */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "h-9 ",
+                      dateFilter && "border-primary/50 bg-primary/5",
+                    )}
+                  >
+                    <CalendarIcon className="h-3 w-3 mr-2" />
+                    {dateFilter ? format(dateFilter, "MMM dd") : "Select Date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateFilter}
+                    onSelect={(date) => setDateFilter(date)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
 
           {/* Date Filter */}
-          <div className="flex items-center gap-1">
+          {/* <div className="flex items-center gap-1">
             <Input
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
               className={cn("h-9 w-auto", dateFilter && "border-primary/50 bg-primary/5")}
             />
-          </div>
+          </div> */}
 
           <Separator orientation="vertical" className="h-6" />
         </div>
@@ -569,7 +594,7 @@ const ExpendituresPage = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                       <span>{formatDate(expenditure.expendDate)}</span>
                     </div>
                   </TableCell>

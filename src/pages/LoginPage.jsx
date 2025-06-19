@@ -1,122 +1,214 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-
-// Import shadcn components
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { RxLockClosed } from "react-icons/rx";
-import { MdMailOutline } from "react-icons/md";
+import React from "react"
+import { useState, useCallback } from "react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
+import { Lock, Mail, Shield, Eye, EyeOff, Loader2, CheckCircle } from "lucide-react"
+import { Link, useNavigate } from "react-router-dom"
+import axios from "axios"
+import { useAuth } from "../context/AuthContext"
 import { toast } from "sonner"
-import axios from 'axios';
 
 export const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('');
+  const [error, setError] = useState("")
+  const [lastSubmit, setLastSubmit] = useState(0)
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+  // Throttling: prevent multiple submissions within 2 seconds
+  const THROTTLE_DELAY = 2000
 
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signin`, {
-        email,
-        password
-      }, { withCredentials: true })
+  const handleLogin = useCallback(
+    async (e) => {
+      e.preventDefault()
 
-      login(res.data.user)
-      toast('Login successful', 'success')
-      navigate('/')
-    } catch (err) {
-      console.error(err)
-      const msg = err?.response?.data?.message || 'Login failed'
-      toast(msg, 'error')
-    } finally {
-      setLoading(false)
-    }
-  }
+      // Throttling check
+      const now = Date.now()
+      if (now - lastSubmit < THROTTLE_DELAY) {
+        return
+      }
+
+      setLastSubmit(now)
+      setLoading(true)
+      setError("")
+
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 1500))
+
+        // Replace with actual API call
+        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signin`, {
+          email,
+          password
+        }, { withCredentials: true })
+
+        login(res.data.user)
+        toast('Login successful', 'success')
+        navigate('/')
+      } catch (err) {
+        const msg = err?.response?.data?.message || 'Login failed'
+        toast(msg, 'error')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [email, password, lastSubmit],
+  )
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 p-4">
-      <Card className="w-full max-w-md shadow-lg transition-all duration-300 hover:shadow-xl">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-2">
-            <div className="rounded-full bg-primary/10 p-3">
-              <RxLockClosed className="h-6 w-6 text-primary" />
-            </div>
-          </div>
-          <CardTitle className="text-2xl font-bold">Military Asset & Inventory</CardTitle>
-          <CardDescription>
-            Sign in to manage assets & inventory
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <div className="relative">
-                <MdMailOutline className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  className="pl-10"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className=" flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <a
-                  href="#"
-                  className="hidden text-xs text-primary underline-offset-4 hover:underline"
-                >
-                  Forgot password?
-                </a>
-              </div>
-              <div className="relative">
-                <RxLockClosed className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  className="pl-10"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-            <Button type="submit" className="w-full">
-              Sign In
-            </Button>
-          </form>          
+    <div className="min-h-screen flex items-center justify-center p-4 bg-neutral">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-secondary/90 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-primary/20 to-secondary/90 rounded-full blur-3xl" />
+      </div>
 
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-xs text-muted-foreground">
-            Need help?{" "}
-            <a href="#" className="text-primary underline-offset-4 hover:underline">
-              Contact Support
-            </a>
+      <div className="relative w-full max-w-md">
+        <Card className="shadow-2xl border-0 bg-secondary/40 backdrop-blur-xl">
+          <CardHeader className="space-y-4 text-center pb-8">
+            <div className="flex justify-center">
+              <div className="relative">
+                <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-lg">
+                  <Shield className="w-8 h-8 text-primary" />
+                </div>
+                <div className="absolute -top-1 -right-1">
+                  <Badge variant="secondary" className="text-xs px-2 py-1 bg-green-100 text-green-700 border-green-200">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Secure
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+                Military Asset & Inventory
+              </CardTitle>
+              <CardDescription className="text-slate-600 dark:text-slate-400">
+                Secure access to military asset management system
+              </CardDescription>
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            {error && (
+              <Alert variant="destructive" className="border-red-200 bg-red-50 dark:bg-red-950/50">
+                <AlertDescription className="text-red-800 dark:text-red-200">{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Email Address
+                </Label>
+                <div className="relative group">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="officer@military.gov"
+                    className="pl-10 h-12 border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Password
+                  </Label>
+                </div>
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••••••"
+                    className="pl-10 pr-10 h-12 border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-1 top-1 h-10 w-10 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={loading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-slate-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-slate-400" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || !email || !password}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Authenticating...
+                  </>
+                ) : (
+                  <>
+                    <Shield className="w-4 h-4 mr-2" />
+                    Sign In Securely
+                  </>
+                )}
+              </Button>
+            </form>
+
+
+          </CardContent>
+
+          <CardFooter className="flex flex-col space-y-4 pt-6">
+            <div className="text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Need assistance?{" "}
+                <Link
+                  href="/support"
+                  className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+                >
+                  Contact IT Support
+                </Link>
+              </p>
+            </div>
+
+            {/* <div className="text-center">
+              <p className="text-xs text-slate-400 dark:text-slate-500">Protected by military-grade encryption</p>
+            </div> */}
+          </CardFooter>
+        </Card>
+
+        {/* Security notice */}
+        {/* <div className="mt-6 text-center">
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+            This system is for authorized personnel only. All activities are monitored and logged.
           </p>
-        </CardFooter>
-      </Card>
+        </div> */}
+      </div>
     </div>
-  );
-};
+  )
+}

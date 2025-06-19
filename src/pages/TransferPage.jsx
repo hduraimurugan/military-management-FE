@@ -6,7 +6,6 @@ import {
   Eye,
   Trash2,
   ArrowRightLeft,
-  Calendar,
   FileText,
   MapPin,
   Search,
@@ -17,11 +16,13 @@ import {
   ChevronDown,
   Package,
   PackageIcon,
+  CalendarIcon,
 } from "lucide-react"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { inventoryAPI, transfersAPI } from "../services/api.js"
 import { useAssetBase } from "../context/AssetBaseContext"
 
+import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -55,6 +56,7 @@ import { cn } from "@/lib/utils"
 import { useAuth } from "../context/AuthContext"
 import { toast } from "sonner"
 import { Link } from "react-router-dom"
+import { format } from "date-fns"
 
 const TransferPage = () => {
   const { assets, bases } = useAssetBase()
@@ -324,7 +326,7 @@ const TransferPage = () => {
               <div className="flex items-center gap-2">
                 <CardTitle className="flex items-center gap-2">
                   <Filter className="h-5 w-5" />
-                  Search & Filters - Outgoing
+                  Filters - Outgoing
                 </CardTitle>
                 {(searchTerm ||
                   (selectedAssetFilter && selectedAssetFilter !== "all") ||
@@ -358,7 +360,7 @@ const TransferPage = () => {
             {/* Compact Filter Controls */}
             <div className="flex flex-wrap items-center gap-2">
               {/* Search */}
-              <div className="relative min-w-[200px] flex-1 max-w-xs">
+              {/* <div className="relative min-w-[200px] flex-1 max-w-xs">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
                   placeholder="Search transfers..."
@@ -366,7 +368,7 @@ const TransferPage = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
                 />
-              </div>
+              </div> */}
 
               <Separator orientation="vertical" className="h-6" />
 
@@ -496,15 +498,40 @@ const TransferPage = () => {
                 </PopoverContent>
               </Popover>
 
+              {/* Date Filter new */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "h-9 ",
+                      dateFilter && "border-primary/50 bg-primary/5",
+                    )}
+                  >
+                    <CalendarIcon className="h-3 w-3 mr-2" />
+                    {dateFilter ? format(dateFilter, "MMM dd") : "Select Date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateFilter}
+                    onSelect={(date) => setDateFilter(date)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+
               {/* Date Filter */}
-              <div className="flex items-center gap-1">
+              {/* <div className="flex items-center gap-1">
                 <Input
                   type="date"
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
                   className={cn("h-9 w-auto", dateFilter && "border-primary/50 bg-primary/5")}
                 />
-              </div>
+              </div> */}
 
               <Separator orientation="vertical" className="h-6" />
             </div>
@@ -594,7 +621,7 @@ const TransferPage = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                           <span>{formatDate(transfer.transferDate)}</span>
                         </div>
                       </TableCell>
@@ -643,7 +670,7 @@ const TransferPage = () => {
               <div className="flex items-center gap-2">
                 <CardTitle className="flex items-center gap-2">
                   <Filter className="h-5 w-5" />
-                  Search & Filters - Incoming
+                  Filters - Incoming
                 </CardTitle>
                 {(searchTerm ||
                   (selectedAssetFilter && selectedAssetFilter !== "all") ||
@@ -677,7 +704,7 @@ const TransferPage = () => {
             {/* Compact Filter Controls */}
             <div className="flex flex-wrap items-center gap-2">
               {/* Search */}
-              <div className="relative min-w-[200px] flex-1 max-w-xs">
+              {/* <div className="relative min-w-[200px] flex-1 max-w-xs">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
                   placeholder="Search transfers..."
@@ -685,7 +712,7 @@ const TransferPage = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
                 />
-              </div>
+              </div> */}
 
               <Separator orientation="vertical" className="h-6" />
 
@@ -815,15 +842,40 @@ const TransferPage = () => {
                 </Popover>
               )}
 
+              {/* Date Filter new */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "h-9 ",
+                      dateFilter && "border-primary/50 bg-primary/5",
+                    )}
+                  >
+                    <CalendarIcon className="h-3 w-3 mr-2" />
+                    {dateFilter ? format(dateFilter, "MMM dd") : "Select Date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dateFilter}
+                    onSelect={(date) => setDateFilter(date)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+
               {/* Date Filter */}
-              <div className="flex items-center gap-1">
+              {/* <div className="flex items-center gap-1">
                 <Input
                   type="date"
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
                   className={cn("h-9 w-auto", dateFilter && "border-primary/50 bg-primary/5")}
                 />
-              </div>
+              </div> */}
 
               <Separator orientation="vertical" className="h-6" />
             </div>
@@ -913,7 +965,7 @@ const TransferPage = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                           <span>{formatDate(transfer.transferDate)}</span>
                         </div>
                       </TableCell>
@@ -939,7 +991,7 @@ const TransferPage = () => {
                       : "Try adjusting your search or filter criteria."}
                   </p>
 
-                   {(isAdmin || isLogisticsOfficer) && filteredTransfers.length === 0 && (
+                  {(isAdmin || isLogisticsOfficer) && filteredTransfers.length === 0 && (
                     <Button onClick={() => setShowCreateModal(true)} className="mt-3">
                       <Plus className="h-4 w-4" />
                       Create Transfer

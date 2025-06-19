@@ -460,7 +460,7 @@ const AssignmentPage = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Assignments</CardTitle>
@@ -497,7 +497,7 @@ const AssignmentPage = () => {
             <div className="text-2xl font-bold">{totalItemsAssigned}</div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* Filters */}
       <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm">
@@ -505,7 +505,7 @@ const AssignmentPage = () => {
           <div className="flex items-center gap-2">
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
-              Search & Filters
+              Filters
             </CardTitle>
             {activeFiltersCount > 0 && (
               <Badge variant="secondary" className="text-xs">
@@ -524,7 +524,7 @@ const AssignmentPage = () => {
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Search */}
-          <div className="relative min-w-[200px] flex-1 max-w-xs">
+          {/* <div className="relative min-w-[200px] flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Search by assigned to..."
@@ -532,7 +532,7 @@ const AssignmentPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
             />
-          </div>
+          </div> */}
 
           <Separator orientation="vertical" className="h-6" />
 
