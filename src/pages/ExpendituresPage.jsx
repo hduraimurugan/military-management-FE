@@ -185,7 +185,7 @@ const ExpendituresPage = () => {
       fetchExpenditures()
       toast.success("Expenditure created successfully")
     } catch (err) {
-      setError(err.message)
+      // setError(err.message)
       toast.error(err.message)
     }
   }
@@ -198,7 +198,7 @@ const ExpendituresPage = () => {
       fetchExpenditures()
       toast.success("Expenditure deleted successfully")
     } catch (err) {
-      setError(err.message)
+      // setError(err.message)
       toast.error(err.message)
     }
   }

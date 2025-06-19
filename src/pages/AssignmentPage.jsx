@@ -77,6 +77,7 @@ const AssignmentPage = () => {
     expendedBy: "",
     remarks: "",
     expendDate: new Date(),
+    base: ""
   })
 
   // Filter states
@@ -189,7 +190,7 @@ const AssignmentPage = () => {
   }
 
   // Handle mark as expended
-  const handleMarkAsExpended = async () => {
+  const handleMarkAsExpended = async (data) => {
     try {
       const expendData = {
         expendedBy: expendForm.expendedBy,
@@ -199,6 +200,7 @@ const AssignmentPage = () => {
         })),
         remarks: expendForm.remarks,
         expendDate: expendForm.expendDate.toISOString(),
+        base: isAdmin ? data.base._id : ""
       }
 
       await expenditureAPI.markAssignedAsExpended(expendData, selectedAssignment._id)
@@ -861,6 +863,15 @@ const AssignmentPage = () => {
               </div>
 
               <div className="space-y-2">
+                <Label>Base</Label>
+                <div className="mt-1">
+                  <Badge variant="default">
+                    {selectedAssignment.base.name}
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <Label>Assigned Items</Label>
                 <div className="space-y-2 mt-2">
                   {selectedAssignment.items.map((item, index) => (
@@ -951,7 +962,7 @@ const AssignmentPage = () => {
               Close
             </Button>
             {!selectedAssignment?.isExpended && selectedItems.length > 0 && (
-              <Button onClick={handleMarkAsExpended}>
+              <Button onClick={() => handleMarkAsExpended(selectedAssignment)}>
                 <CheckCircle2 className="mr-2 h-4 w-4" />
                 Mark as Expended
               </Button>

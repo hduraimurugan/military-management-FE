@@ -231,7 +231,7 @@ export const purchasesAPI = {
     });
     // if (!response.ok) throw new Error("Failed to delete purchase bill");
     // return response.json();
-     const result = await response.json();
+    const result = await response.json();
 
     if (!response.ok) {
       const errorMessage = result?.error || result?.message || "Failed to delete purchase bill";
@@ -519,3 +519,41 @@ export const assignmentAPI = {
     return result;
   },
 };
+
+// movement Api
+export const movementAPI = {
+
+  // 📋 Get all assignments for the current user's base
+  getAll: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/api/movement?${query}`, {
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result?.error || result?.message || "Failed to fetch movement logs";
+      throw new Error(errorMessage);
+    }
+
+    return result;
+  },
+
+  // // 🔍 Get a single assignment by ID
+  // getById: async (id) => {
+  //   const response = await fetch(`${API_BASE_URL}/api/assign/get/${id}`, {
+  //     credentials: "include",
+  //   });
+
+  //   const result = await response.json();
+
+  //   if (!response.ok) {
+  //     const errorMessage = result?.error || result?.message || "Failed to fetch assignment";
+  //     throw new Error(errorMessage);
+  //   }
+
+  //   return result;
+  // },
+};
+

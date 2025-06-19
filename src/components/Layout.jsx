@@ -91,7 +91,7 @@ export const Layout = () => {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-[280px]">
+              <SheetContent side="left" className="px-3 w-[280px] mt-2">
                 <ScrollArea className="h-full">
                   <Sidebar pageTitle={pageTitle} />
                 </ScrollArea>
@@ -100,23 +100,23 @@ export const Layout = () => {
 
             {/* App logo/title for mobile */}
             <Link to="/" className="flex items-center gap-2 lg:hidden">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-                <FaPersonMilitaryRifle className="h-5 w-5 text-primary-foreground" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary">
+                <FaPersonMilitaryRifle className="h-4 w-4 text-primary-foreground" />
               </div>
               <span className="font-semibold text-lg hidden sm:inline-block">
-                Military Base :
-                {isAdmin ? "Management" : user.baseName}
+                Military Base Management:
+                {/* {isAdmin ? "Management" : user.baseName} */}
               </span>
             </Link>
 
             {/* App logo/title for Web */}
             <div className="hidden lg:flex h-16 items-center">
               <Link to="/" className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-                  <FaPersonMilitaryRifle className="h-5 w-5 text-primary-foreground" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary">
+                  <FaPersonMilitaryRifle className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <span className="font-semibold text-lg">
-                  Military Asset :
+                  Military Asset Management:
                   {/* {isAdmin ? "Management" : user.baseName} */}
                 </span>
               </Link>

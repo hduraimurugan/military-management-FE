@@ -17,7 +17,7 @@ const roles = [
   { value: "admin", label: "Admin" },
   { value: "base_commander", label: "Base Commander" },
   { value: "logistics_officer", label: "Logistics Officer" },
-  { value: "user", label: "User" },
+  // { value: "user", label: "User" },
 ]
 
 export function UserFormModal({ isOpen, onClose, onSave, user, mode, bases }) {

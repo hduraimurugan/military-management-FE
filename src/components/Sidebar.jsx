@@ -25,7 +25,8 @@ import {
   Calendar,
   HelpCircle,
   ChevronRight,
-  LucideNotebookText
+  LucideNotebookText,
+  LucideLogs
 } from 'lucide-react';
 import { MdAssignmentTurnedIn, MdOutlineAssignmentTurnedIn, MdOutlineInventory2 } from 'react-icons/md';
 import { FaUsers } from 'react-icons/fa6';
@@ -80,7 +81,7 @@ export const Sidebar = ({ pageTitle }) => {
     {
       name: 'Movement Logs',
       path: '/reports',
-      icon: <FileText className="h-5 w-5" />,
+      icon: <LucideLogs className="h-5 w-5" />,
       roles: ['admin']
     }
   ];
