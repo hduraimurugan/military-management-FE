@@ -1,19 +1,19 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from "@/components/ui/sonner"
 import { ProtectedRoute } from './routes/ProtectedRoutes.jsx'
-import { Layout } from './components/Layout'
 import { LoginPage } from './pages/LoginPage'
-import { DashboardPage } from './pages/DashboardPage'
-import { ProfilePage } from './pages/ProfilePage'
+import { Layout } from './components/Layout'
+import { UnauthorizedPage } from './pages/UnauthorizedPage.jsx';
 import { SettingsPage } from './pages/SettingsPage'
+import { ProfilePage } from './pages/ProfilePage'
+import DashboardPage from './pages/DashboardPage'
 import UsersPage from './pages/UsersPage.jsx'
 import PurchasePage from './pages/PurchasePage.jsx';
 import TransferPage from './pages/TransferPage.jsx';
-import ReportsPage from './pages/ReportsPage.jsx';
 import AssignmentPage from './pages/AssignmentPage.jsx';
-import { UnauthorizedPage } from './pages/UnauthorizedPage.jsx';
-import StocksPage from './pages/StocksPage.jsx';
 import ExpendituresPage from './pages/ExpendituresPage.jsx';
+import StocksPage from './pages/StocksPage.jsx';
+import ReportsPage from './pages/ReportsPage.jsx';
 import { useAuth } from './context/AuthContext.jsx'
 
 function App() {

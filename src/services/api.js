@@ -557,3 +557,19 @@ export const movementAPI = {
   // },
 };
 
+// Data Summary API
+export const dataSummaryAPI = {
+  /**
+   * Get inventory for the current user's base (with optional asset filter)
+   * @param {Object} params - Optional query parameters
+   * @param {string} params.asset - Filter by asset ID
+   */
+  getMyStock: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/api/summary?${query}`, {
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error("Failed to fetch user inventory");
+    return response.json();
+  },
+};
