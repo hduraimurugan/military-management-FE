@@ -38,7 +38,7 @@ import { istTimeZone } from "../utils/constants.js"
 import DashboardSkeleton from "../components/DashboardSkeleton.jsx"
 
 const DashboardPage = () => {
-  const { user, logout } = useAuth()
+  const { user, isAdmin } = useAuth()
   const { bases } = useAssetBase()
   const navigate = useNavigate()
   const [summaryData, setSummaryData] = useState([])
@@ -54,7 +54,7 @@ const DashboardPage = () => {
     dateFrom: null,
     dateTo: null,
     category: "All categories",
-    base_id: user?.role === "admin" && bases.length > 0 ? bases[0]._id : "",
+    base_id: isAdmin && bases.length > 0 ? bases[0]._id : "",
   })
 
   // Fetch dashboard data
