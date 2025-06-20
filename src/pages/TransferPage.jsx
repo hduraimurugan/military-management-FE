@@ -194,9 +194,10 @@ const TransferPage = () => {
       await transfersAPI.create(createData)
       setShowCreateModal(false)
       resetForm()
+      toast.success("Transfer entry done succesfully")
       fetchTransfers()
     } catch (err) {
-      toast(err.message, "destructive")
+      toast.error(err.message)
     }
   }
 
@@ -207,8 +208,8 @@ const TransferPage = () => {
       setSelectedTransfer(null)
       fetchTransfers()
     } catch (err) {
-      setError(err.message)
-      toast(err.message, "destructive")
+      // setError(err.message)
+      toast.error(err.message)
     }
   }
 

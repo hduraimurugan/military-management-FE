@@ -55,7 +55,7 @@ const PurchasePage = () => {
   const [selectedPurchase, setSelectedPurchase] = useState(null)
   const [inventoryData, setInventoryData] = useState([])
   const [showViewModal, setShowViewModal] = useState(false)
-
+  const [createLoading, setCreateLoading] = useState(false)
 
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("")
@@ -147,6 +147,7 @@ const PurchasePage = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault()
+    setCreateLoading(true)
     try {
       const createData = {
         ...formData,
@@ -155,10 +156,13 @@ const PurchasePage = () => {
       await purchasesAPI.create(createData)
       setShowCreateModal(false)
       resetForm()
+      toast.success("Purchased bill added")
       fetchPurchases()
     } catch (err) {
       // setError(err.message)
-      toast(err.message, "destructive");
+      toast.error(err.message);
+    } finally {
+      setCreateLoading(false)
     }
   }
 
@@ -1033,7 +1037,13 @@ const PurchasePage = () => {
                           <SelectValue placeholder="Select Asset" />
                         </SelectTrigger>
                         <SelectContent>
-                          {isAdmin
+                          {assets.map((asset) => (
+                            <SelectItem key={asset._id} value={asset._id}>
+                              {asset.name} ({asset.category})
+                            </SelectItem>
+                          ))
+                          }
+                          {/* {isAdmin
                             ? assets.map((asset) => (
                               <SelectItem key={asset._id} value={asset._id}>
                                 {asset.name} ({asset.category})
@@ -1044,7 +1054,7 @@ const PurchasePage = () => {
                                 {stock.asset.name} (Available: {stock.quantity})
                               </SelectItem>
                             ))
-                          }
+                          } */}
                         </SelectContent>
                       </Select>
                     </div>
@@ -1079,7 +1089,7 @@ const PurchasePage = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit">Create Bill</Button>
+              <Button type="submit" disabled={createLoading}>Create Bill</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -1216,7 +1226,7 @@ const PurchasePage = () => {
 
       {/* View Modal */}
       <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" style={{scrollbarWidth: 'none'}}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
           <DialogHeader>
             <DialogTitle>Purchase Details</DialogTitle>
             <DialogDescription>View complete purchase information</DialogDescription>

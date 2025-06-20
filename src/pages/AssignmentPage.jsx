@@ -45,6 +45,7 @@ import { useAuth } from "../context/AuthContext"
 import { useAssetBase } from "../context/AssetBaseContext"
 import { Link } from "react-router-dom"
 import InventorySkeleton from "../components/InventorySkeleton"
+import { toast } from "sonner"
 
 const AssignmentPage = () => {
   const { user, isAdmin, isLogisticsOfficer, isCommander } = useAuth()
@@ -186,11 +187,12 @@ const AssignmentPage = () => {
         remarks: "",
         assignDate: new Date(),
       })
-
+      toast.success("Assignment entry done succesfully")
       // Refresh data
       fetchAssignmentData()
     } catch (err) {
       console.error("Failed to create assignment:", err)
+      toast.error(err.message)
     }
   }
 

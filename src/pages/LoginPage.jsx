@@ -89,11 +89,11 @@ export const LoginPage = () => {
         )
 
         login(res.data.user)
-        toast("Login successful", "success")
+        toast.success("Login successful", "success")
         navigate("/")
       } catch (err) {
         const msg = err?.response?.data?.message || "Login failed"
-        toast(msg, "error")
+        toast.error(msg, "error")
       } finally {
         setLoading(false)
       }

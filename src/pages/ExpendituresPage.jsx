@@ -195,8 +195,8 @@ const ExpendituresPage = () => {
       await expenditureAPI.create(createData)
       setShowCreateModal(false)
       resetForm()
+      toast.success("Expenditure entry done successfully")
       fetchExpenditures()
-      toast.success("Expenditure created successfully")
     } catch (err) {
       // setError(err.message)
       toast.error(err.message)
