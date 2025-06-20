@@ -60,16 +60,16 @@ export const Layout = () => {
   // Set page title based on current route
   useEffect(() => {
     const path = location.pathname;
-    if (path.includes('dashboard')) setPageTitle('Dashboard');
+    if (path.includes('dashboard')) setPageTitle('Dashboard Overview');
     else if (path.includes('profile')) setPageTitle('User Profile');
     else if (path.includes('settings')) setPageTitle('System Settings');
-    else if (path.includes('purchase')) setPageTitle('Purchases');
-    else if (path.includes('transfer')) setPageTitle('Transfers');
-    else if (path.includes('assignment')) setPageTitle('Assignments');
-    else if (path.includes('expend')) setPageTitle('Expends');
-    else if (path.includes('reports')) setPageTitle('Movement Logs');
+    else if (path.includes('purchase')) setPageTitle('Purchases Assets');
+    else if (path.includes('transfer')) setPageTitle('Transfers Assets');
+    else if (path.includes('assignment')) setPageTitle('Assign Assets');
+    else if (path.includes('expend')) setPageTitle('Expend Assets');
+    else if (path.includes('reports')) setPageTitle('Reports & Logs');
     else if (path.includes('stocks')) setPageTitle('Stocks & Inventory');
-    else setPageTitle('Dashboard');
+    else setPageTitle('Dashboard Overview');
   }, [location.pathname]);
 
   const handleSearch = (e) => {
@@ -104,7 +104,7 @@ export const Layout = () => {
                 <FaPersonMilitaryRifle className="h-4 w-4 text-primary-foreground" />
               </div>
               <span className="font-semibold text-lg hidden sm:inline-block">
-                Military Base Management:
+                Military Base Management
                 {/* {isAdmin ? "Management" : user.baseName} */}
               </span>
             </Link>
@@ -116,33 +116,14 @@ export const Layout = () => {
                   <FaPersonMilitaryRifle className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <span className="font-semibold text-lg">
-                  Military Asset Management:
+                  Military Asset Management
                   {/* {isAdmin ? "Management" : user.baseName} */}
                 </span>
               </Link>
             </div>
 
-            <Badge variant="outline" className={getRoleColor(user?.role) + " md:block hidden"}>
+            {/* <Badge variant="outline" className={getRoleColor(user?.role) + " md:block hidden"}>
               {getRoleLabel(user?.role)}
-            </Badge>
-
-            {/* Location */}
-            {/* <Badge
-              variant="outline"
-              className="flex items-center gap-2 bg-primary/10 border-primary/20 text-primary rounded-md px-3 py-1"
-            >
-              <IoLocationSharp className="text-primary text-lg" />
-              <div className="flex flex-row gap-1 leading-tight text-xs">
-                <span className="font-semibold">
-                  {isAdmin ? "Base" : user.baseName}
-                </span>
-                <span className="font-semibold">
-                  ,
-                </span>
-                <span className="text-muted-foreground">
-                  {isAdmin ? "India" : user.state}
-                </span>
-              </div>
             </Badge> */}
           </div>
 
@@ -164,6 +145,11 @@ export const Layout = () => {
 
           {/* Right side actions */}
           <div className="flex items-center justify-end gap-2">
+            {/* Role */}
+            <Badge variant="outline" className={getRoleColor(user?.role) + " md:block hidden"}>
+              {getRoleLabel(user?.role)}
+            </Badge>
+
             {/* Location */}
             <Badge
               variant="outline"
@@ -325,9 +311,9 @@ export const Layout = () => {
       <div className="flex flex-1 min-h-0">
         {/* Sidebar - Hidden on mobile */}
         <aside className="hidden h-full border-r bg-background lg:block lg:w-64 lg:flex-shrink-0">
-          <ScrollArea className="h-full">
-            <Sidebar pageTitle={pageTitle} />
-          </ScrollArea>
+          {/* <ScrollArea className="h-full"> */}
+          <Sidebar pageTitle={pageTitle} />
+          {/* </ScrollArea> */}
         </aside>
 
         {/* Page Content - Scrollable */}
