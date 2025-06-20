@@ -227,66 +227,6 @@ const DashboardPage = () => {
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-none px-1 py-2">
-          {/* Category Filter */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9">
-                <Tag className="h-3 w-3 mr-2" />
-                {filters.category === "All categories" ? "Category" : filters.category}
-                <ChevronDown className="h-3 w-3 ml-2" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48 p-2" align="start">
-              <div className="space-y-1">
-                {["All categories", "weapon", "vehicle", "ammunition", "equipment"].map((category) => (
-                  <Button
-                    key={category}
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      "w-full justify-start h-8 text-sm",
-                      filters.category === category && "bg-primary/10 text-primary",
-                    )}
-                    onClick={() => setFilters((prev) => ({ ...prev, category }))}
-                  >
-                    {category}
-                  </Button>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {/* Base Selector (Admin Only) */}
-          {user?.role === "admin" && bases.length > 0 && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-9">
-                  <Building2 className="h-3 w-3 mr-2" />
-                  {bases.find((b) => b._id === filters.base_id)?.name || "Select Base"}
-                  <ChevronDown className="h-3 w-3 ml-2" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-48 p-2" align="start">
-                <div className="space-y-1">
-                  {bases.map((base) => (
-                    <Button
-                      key={base._id}
-                      variant="ghost"
-                      size="sm"
-                      className={cn(
-                        "w-full justify-start h-8 text-sm",
-                        filters.base_id === base._id && "bg-primary/10 text-primary",
-                      )}
-                      onClick={() => setFilters((prev) => ({ ...prev, base_id: base._id }))}
-                    >
-                      {base.name}
-                    </Button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
-
           {/* Date Range */}
           <div className="flex items-center gap-1">
             <Popover>
@@ -315,32 +255,7 @@ const DashboardPage = () => {
             </Popover>
 
           </div>
-        </div>
-      </Card>
 
-      {/* Web Filters */}
-      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm md:block hidden">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filters
-            </CardTitle>
-            {activeFiltersCount > 0 && (
-              <Badge variant="secondary" className="text-xs">
-                {activeFiltersCount} active
-              </Badge>
-            )}
-          </div>
-          {activeFiltersCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2">
-              <X className="h-3 w-3 mr-1" />
-              Clear
-            </Button>
-          )}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
           {/* Category Filter */}
           <Popover>
             <PopoverTrigger asChild>
@@ -371,7 +286,120 @@ const DashboardPage = () => {
           </Popover>
 
           {/* Base Selector (Admin Only) */}
-          {user?.role === "admin" && bases.length > 0 && (
+          {isAdmin && bases.length > 0 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <Building2 className="h-3 w-3 mr-2" />
+                  {bases.find((b) => b._id === filters.base_id)?.name || "Select Base"}
+                  <ChevronDown className="h-3 w-3 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start">
+                <div className="space-y-1">
+                  {bases.map((base) => (
+                    <Button
+                      key={base._id}
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        filters.base_id === base._id && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setFilters((prev) => ({ ...prev, base_id: base._id }))}
+                    >
+                      {base.name}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}          
+        </div>
+      </Card>
+
+      {/* Web Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm md:block hidden">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filters
+            </CardTitle>
+            {activeFiltersCount > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {activeFiltersCount} active
+              </Badge>
+            )}
+          </div>
+          {activeFiltersCount > 0 && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2">
+              <X className="h-3 w-3 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Date */}
+          <div className="flex items-center gap-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn("h-9", filters.date && "border-primary/50 bg-primary/5")}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {
+                    filters.date
+                      ? (formatInTimeZone(filters.date, istTimeZone, "MMM dd, yyyy"))
+                      : "As on Date"
+                  }
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.date}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, date: date }))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Category Filter */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Tag className="h-3 w-3 mr-2" />
+                {filters.category === "All categories" ? "Category" : filters.category}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1">
+                {["All categories", "weapon", "vehicle", "ammunition", "equipment"].map((category) => (
+                  <Button
+                    key={category}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      filters.category === category && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setFilters((prev) => ({ ...prev, category }))}
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Base Selector (Admin Only) */}
+          {isAdmin && bases.length > 0 && (
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="h-9">
@@ -400,57 +428,7 @@ const DashboardPage = () => {
               </PopoverContent>
             </Popover>
           )}
-
-          {/* Date */}
-          <div className="flex items-center gap-1">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn("h-9", filters.date && "border-primary/50 bg-primary/5")}
-                >
-                  <CalendarIcon className="h-3 w-3 mr-2" />
-                  {
-                    filters.date
-                      ? (formatInTimeZone(filters.date, istTimeZone, "MMM dd, yyyy"))
-                      : "As on Date"
-                  }
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={filters.date}
-                  onSelect={(date) => setFilters((prev) => ({ ...prev, date: date }))}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-
-            {/* <span className="text-primary/50 text-sm">to</span>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn("h-9", filters.dateTo && "border-primary/50 bg-primary/5")}
-                >
-                  <CalendarIcon className="h-3 w-3 mr-2" />
-                  {filters.dateTo ? format(filters.dateTo, "MMM dd") : "To"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={filters.dateTo}
-                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover> */}
-          </div>
+          
         </div>
       </Card>
 
