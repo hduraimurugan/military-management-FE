@@ -72,7 +72,7 @@ export const Sidebar = ({ pageTitle }) => {
 
         {/* Header */}
         {/* App logo/title for mobile */}
-        <div className="lg:hidden px-4 py-3 border-b">
+        <div className="lg:hidden px-3 py-5 border-b">
           <Link to="/" className="flex items-center gap-2 ">
             <div className="flex h-5 w-5 items-center justify-center rounded-md bg-primary">
               <FaPersonMilitaryRifle className="h-3 w-3 text-primary-foreground" />

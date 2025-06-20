@@ -37,6 +37,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { IoLocationSharp } from "react-icons/io5";
 import { getRoleColor, getRoleLabel } from '../utils/roleColorLabel';
+import Notifications from '../pages/Notifications';
 
 export const Layout = () => {
   const { user, logout, isAdmin, isLogisticsOfficer } = useAuth();
@@ -91,7 +92,7 @@ export const Layout = () => {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="px-3 w-[280px] mt-2">
+              <SheetContent side="left" className="px-3 w-[280px]">
                 <ScrollArea className="h-full">
                   <Sidebar pageTitle={pageTitle} />
                 </ScrollArea>
@@ -193,43 +194,15 @@ export const Layout = () => {
                   <span className="sr-only">Notifications</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuContent align="end" className="md:w-77 w-88">
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium">Notifications</p>
-                    <p className="text-xs text-muted-foreground">You have 3 unread messages</p>
+                    {/* <p className="text-xs text-muted-foreground">You have 3 unread messages</p> */}
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <div className="max-h-80 overflow-y-auto">
-                  <div className="flex items-start gap-4 p-3 hover:bg-muted/50 rounded-md transition-colors">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                      <User className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-medium">New user registration</p>
-                      <p className="text-xs text-muted-foreground">2 minutes ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4 p-3 hover:bg-muted/50 rounded-md transition-colors">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                      <Settings className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-medium">System update available</p>
-                      <p className="text-xs text-muted-foreground">40 minutes ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4 p-3 hover:bg-muted/50 rounded-md transition-colors">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                      <Bell className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-medium">5 pending tasks</p>
-                      <p className="text-xs text-muted-foreground">1 hour ago</p>
-                    </div>
-                  </div>
-                </div>
+                <Notifications />
                 <DropdownMenuSeparator />
                 <Link to="/notifications" className="block w-full">
                   <Button variant="ghost" className="w-full justify-center">View All</Button>
