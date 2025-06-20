@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Plus, Edit, Trash2, Package, FileText, MapPin, Search, Filter, X, CalendarIcon } from "lucide-react"
+import { Plus, Edit, Trash2, Package, FileText, MapPin, Search, Filter, X, CalendarIcon, Eye } from "lucide-react"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { inventoryAPI, purchasesAPI } from "../services/api"
 import { useAssetBase } from "../context/AssetBaseContext"
@@ -53,6 +53,7 @@ const PurchasePage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedPurchase, setSelectedPurchase] = useState(null)
   const [inventoryData, setInventoryData] = useState([])
+  const [showViewModal, setShowViewModal] = useState(false)
 
 
   // Search and filter state
@@ -210,6 +211,20 @@ const PurchasePage = () => {
       purchaseDate: new Date(purchase.purchaseDate).toISOString().split("T")[0],
     })
     setShowEditModal(true)
+  }
+
+  const openViewModal = (purchase) => {
+    setSelectedPurchase(purchase)
+    setFormData({
+      items: purchase.items.map((item) => ({
+        asset: item.asset._id,
+        quantity: item.quantity,
+      })),
+      invoiceNumber: purchase.invoiceNumber,
+      remarks: purchase.remarks,
+      purchaseDate: new Date(purchase.purchaseDate).toISOString().split("T")[0],
+    })
+    setShowViewModal(true)
   }
 
   const openDeleteModal = (purchase) => {
@@ -813,6 +828,9 @@ const PurchasePage = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => openViewModal(purchase)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="sm" onClick={() => openEditModal(purchase)}>
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -1194,6 +1212,92 @@ const PurchasePage = () => {
               <Button type="submit">Update Bill</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Modal */}
+      <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" style={{scrollbarWidth: 'none'}}>
+          <DialogHeader>
+            <DialogTitle>Purchase Details</DialogTitle>
+            <DialogDescription>View complete purchase information</DialogDescription>
+          </DialogHeader>
+
+          {selectedPurchase && (
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Invoice Number</Label>
+                  <p className="font-medium">{selectedPurchase.invoiceNumber}</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Purchase Date</Label>
+                  <p className="font-medium">{formatDate(selectedPurchase.purchaseDate)}</p>
+                </div>
+              </div>
+
+              {/* Remarks */}
+              {selectedPurchase.remarks && (
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Remarks</Label>
+                  <p className="p-3 bg-muted rounded-lg">{selectedPurchase.remarks}</p>
+                </div>
+              )}
+
+              {/* Base info (admin only) */}
+              {isAdmin && selectedPurchase.base && (
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Base</Label>
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="font-medium">{selectedPurchase.base.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedPurchase.base.district}, {selectedPurchase.base.state}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Items Table */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-muted-foreground">Items</Label>
+                <div className="border rounded-lg overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Asset</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Unit</TableHead>
+                        <TableHead className="text-right">Quantity</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {selectedPurchase.items.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{item.asset.name}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{item.asset.category}</Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">{item.asset.unit}</TableCell>
+                          <TableCell className="text-right font-medium">{item.quantity}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                  <span className="font-medium">Total Items:</span>
+                  <span className="font-bold">{getTotalItems(selectedPurchase.items)}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowViewModal(false)}>
+              Close
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
