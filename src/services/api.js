@@ -569,7 +569,7 @@ export const dataSummaryAPI = {
     const response = await fetch(`${API_BASE_URL}/api/summary?${query}`, {
       credentials: "include",
     });
-    if (!response.ok) throw new Error("Failed to fetch user inventory");
+    if (!response.ok) throw new Error("Failed to fetch dashboard");
     return response.json();
   },
 };

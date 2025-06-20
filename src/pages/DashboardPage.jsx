@@ -31,15 +31,16 @@ import {
   Eye,
 } from "lucide-react"
 import { format } from "date-fns"
+import { formatInTimeZone } from 'date-fns-tz'
 import { cn } from "@/lib/utils"
 import { dataSummaryAPI } from "../services/api.js"
 import { useAssetBase } from "../context/AssetBaseContext"
+import { istTimeZone } from "../utils/constants.js"
 
 const DashboardPage = () => {
   const { user, logout } = useAuth()
   const { bases } = useAssetBase()
   const navigate = useNavigate()
-
   const [summaryData, setSummaryData] = useState([])
   const [baseInfo, setBaseInfo] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -288,7 +289,11 @@ const DashboardPage = () => {
                   className={cn("h-9", filters.date && "border-primary/50 bg-primary/5")}
                 >
                   <CalendarIcon className="h-3 w-3 mr-2" />
-                  {filters.date ? format(filters.date, "MMM dd") : "As on Date"}
+                  {
+                    filters.date
+                      ? (formatInTimeZone(filters.date, istTimeZone, "MMM dd, yyyy"))
+                      : "As on Date"
+                  }
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">

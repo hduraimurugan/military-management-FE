@@ -30,22 +30,15 @@ export const LoginPage = () => {
   const handleLogin = useCallback(
     async (e) => {
       e.preventDefault()
-
       // Throttling check
       const now = Date.now()
       if (now - lastSubmit < THROTTLE_DELAY) {
         return
       }
-
       setLastSubmit(now)
       setLoading(true)
       setError("")
-
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500))
-
-        // Replace with actual API call
         const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signin`, {
           email,
           password

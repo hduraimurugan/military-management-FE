@@ -507,31 +507,31 @@ const StocksPage = () => {
                   <TableHead>
                     <Button
                       variant="ghost"
-                      // onClick={() => handleSort("purchased")}
+                      onClick={() => handleSort("purchased")}
                       className="h-auto p-0 font-semibold"
                     >
                       Purchased
-                      {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+                      <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                   </TableHead>
                   <TableHead>
                     <Button
                       variant="ghost"
-                      // onClick={() => handleSort("expended")}
+                      onClick={() => handleSort("expended")}
                       className="h-auto p-0 font-semibold"
                     >
                       Expended
-                      {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+                      <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                   </TableHead>
                   <TableHead>
                     <Button
                       variant="ghost"
-                      // onClick={() => handleSort("assigned")}
+                      onClick={() => handleSort("assigned")}
                       className="h-auto p-0 font-semibold"
                     >
                       Assigned
-                      {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+                      <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                   </TableHead>
                   <TableHead>Transferred Out</TableHead>
