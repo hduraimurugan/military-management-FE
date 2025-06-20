@@ -207,9 +207,17 @@ export const Sidebar = ({ pageTitle }) => {
                 <p className="text-xs text-muted-foreground">Check our docs</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="mt-3 w-full">
-              View Documentation
-            </Button>
+            <a
+              href="https://github.com/hduraimurugan/military-management-FE/blob/main/README.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 block w-full"
+            >
+              <Button variant="outline" size="sm" className="w-full">
+                View Documentation
+              </Button>
+            </a>
+
           </div>
         </div>
 
