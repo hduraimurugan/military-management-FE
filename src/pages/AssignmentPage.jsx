@@ -664,14 +664,17 @@ const AssignmentPage = () => {
             </Popover>
           )}
 
-          {/* Date Range */}
+          {/* Date Range New */}
           <div className="flex items-center gap-1">
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
-                  className={cn("h-9", filters.dateFrom && "border-primary/50 bg-primary/5")}
+                  className={cn(
+                    "h-9 ",
+                    filters.dateFrom && "border-primary/50 bg-primary/5",
+                  )}
                 >
                   <CalendarIcon className="h-3 w-3 mr-2" />
                   {filters.dateFrom ? format(filters.dateFrom, "MMM dd") : "From"}
@@ -681,8 +684,20 @@ const AssignmentPage = () => {
                 <Calendar
                   mode="single"
                   selected={filters.dateFrom}
-                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  // onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  onSelect={(date) => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      dateFrom: date,
+                      dateTo: prev.dateTo && date && date > prev.dateTo ? null : prev.dateTo,
+                    }));
+                  }}
+
                   initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates after dateTo
+                    return filters.dateTo ? date > filters.dateTo : false;
+                  }}
                 />
               </PopoverContent>
             </Popover>
@@ -694,7 +709,10 @@ const AssignmentPage = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className={cn("h-9", filters.dateTo && "border-primary/50 bg-primary/5")}
+                  className={cn(
+                    "h-9 ",
+                    filters.dateTo && "border-primary/50 bg-primary/5",
+                  )}
                 >
                   <CalendarIcon className="h-3 w-3 mr-2" />
                   {filters.dateTo ? format(filters.dateTo, "MMM dd") : "To"}
@@ -706,10 +724,15 @@ const AssignmentPage = () => {
                   selected={filters.dateTo}
                   onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
                   initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates before dateFrom
+                    return filters.dateFrom ? date < filters.dateFrom : false;
+                  }}
                 />
               </PopoverContent>
             </Popover>
           </div>
+
         </div>
 
         {/* Active Filters Display */}

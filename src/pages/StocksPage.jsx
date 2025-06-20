@@ -348,7 +348,7 @@ const StocksPage = () => {
             </Popover>
           )}
 
-          {/* Date Range */}
+          {/* Date Range New */}
           <div className="flex items-center gap-1">
             <Popover>
               <PopoverTrigger asChild>
@@ -368,8 +368,20 @@ const StocksPage = () => {
                 <Calendar
                   mode="single"
                   selected={filters.dateFrom}
-                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  // onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  onSelect={(date) => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      dateFrom: date,
+                      dateTo: prev.dateTo && date && date > prev.dateTo ? null : prev.dateTo,
+                    }));
+                  }}
+
                   initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates after dateTo
+                    return filters.dateTo ? date > filters.dateTo : false;
+                  }}
                 />
               </PopoverContent>
             </Popover>
@@ -396,6 +408,10 @@ const StocksPage = () => {
                   selected={filters.dateTo}
                   onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
                   initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates before dateFrom
+                    return filters.dateFrom ? date < filters.dateFrom : false;
+                  }}
                 />
               </PopoverContent>
             </Popover>

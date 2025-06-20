@@ -90,6 +90,12 @@ const ExpendituresPage = () => {
     expendDate: new Date().toISOString().split("T")[0],
   })
 
+  // Filter states
+  const [filters, setFilters] = useState({
+    dateFrom: null,
+    dateTo: null,
+  })
+
   const fetchExpenditures = async () => {
     try {
       setLoading(true)
@@ -99,6 +105,8 @@ const ExpendituresPage = () => {
         ...(selectedBaseFilter && { baseId: selectedBaseFilter }),
         ...(selectedAssetFilter && { assetId: selectedAssetFilter }),
         ...(dateFilter && { date: dateFilter }),
+        ...(filters.dateTo && { dateTo: filters.dateTo }),
+        ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
         ...(expendedByFilter && { expendedBy: expendedByFilter }),
         ...(searchTerm && { search: searchTerm }),
       }
@@ -133,7 +141,7 @@ const ExpendituresPage = () => {
 
   useEffect(() => {
     fetchExpenditures()
-  }, [expenditureData.currentPage, selectedBaseFilter, selectedAssetFilter, dateFilter, expendedByFilter])
+  }, [expenditureData.currentPage, selectedBaseFilter, selectedAssetFilter, dateFilter, expendedByFilter, filters])
 
   useEffect(() => {
     // Apply search filter on client side
@@ -170,6 +178,10 @@ const ExpendituresPage = () => {
     setSelectedAssetFilter("")
     setDateFilter("")
     setExpendedByFilter("")
+    setFilters({
+      dateFrom: null,
+      dateTo: null,
+    })
   }
 
   const handleCreate = async (e) => {
@@ -455,50 +467,75 @@ const ExpendituresPage = () => {
             </Popover>
           )}
 
-          {/* Expended By Filter */}
-          {/* <div className="min-w-[150px]">
-            <Input
-              placeholder="Expended by..."
-              value={expendedByFilter}
-              onChange={(e) => setExpendedByFilter(e.target.value)}
-              className="h-9"
-            />
-          </div> */}
+          {/* Date Range New */}
+          <div className="flex items-center gap-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateFrom && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateFrom ? format(filters.dateFrom, "MMM dd") : "From"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateFrom}
+                  // onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  onSelect={(date) => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      dateFrom: date,
+                      dateTo: prev.dateTo && date && date > prev.dateTo ? null : prev.dateTo,
+                    }));
+                  }}
 
-          {/* Date Filter new */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "h-9 ",
-                  dateFilter && "border-primary/50 bg-primary/5",
-                )}
-              >
-                <CalendarIcon className="h-3 w-3 mr-2" />
-                {dateFilter ? format(dateFilter, "MMM dd") : "Select Date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={dateFilter}
-                onSelect={(date) => setDateFilter(date)}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
+                  initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates after dateTo
+                    return filters.dateTo ? date > filters.dateTo : false;
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
 
-          {/* Date Filter */}
-          {/* <div className="flex items-center gap-1">
-            <Input
-              type="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className={cn("h-9 w-auto", dateFilter && "border-primary/50 bg-primary/5")}
-            />
-          </div> */}
+            <span className="text-primary/50 text-sm">to</span>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateTo && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateTo ? format(filters.dateTo, "MMM dd") : "To"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateTo}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
+                  initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates before dateFrom
+                    return filters.dateFrom ? date < filters.dateFrom : false;
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
 
           <Separator orientation="vertical" className="h-6" />
         </div>

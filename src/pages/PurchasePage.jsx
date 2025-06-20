@@ -61,6 +61,12 @@ const PurchasePage = () => {
   const [selectedBaseFilter, setSelectedBaseFilter] = useState(isAdmin && bases.length > 0 ? bases[0]._id : "");
   const [dateFilter, setDateFilter] = useState(null)
 
+  // Filter states
+  const [filters, setFilters] = useState({
+    dateFrom: null,
+    dateTo: null,
+  })
+
   // Form state
   const [formData, setFormData] = useState({
     items: [{ asset: "", quantity: 1 }],
@@ -77,7 +83,6 @@ const PurchasePage = () => {
     pages: 1,
   });
 
-
   const fetchPurchases = async () => {
     try {
       setLoading(true);
@@ -87,6 +92,8 @@ const PurchasePage = () => {
         ...(selectedBaseFilter && { baseId: selectedBaseFilter }),
         ...(selectedAssetFilter && { assetId: selectedAssetFilter }),
         ...(dateFilter && { date: dateFilter }),
+        ...(filters.dateTo && { dateTo: filters.dateTo }),
+        ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
       };
 
       const data = await purchasesAPI.getAll(params);
@@ -108,7 +115,7 @@ const PurchasePage = () => {
   // Update useEffect dependencies
   useEffect(() => {
     fetchPurchases();
-  }, [pagination.page, selectedBaseFilter, selectedAssetFilter, dateFilter]);
+  }, [pagination.page, selectedBaseFilter, selectedAssetFilter, dateFilter, filters]);
 
   // Fetch inventory for assignment modal
   useEffect(() => {
@@ -130,6 +137,10 @@ const PurchasePage = () => {
     setSearchTerm("")
     setSelectedAssetFilter("")
     setDateFilter("")
+    setFilters({
+      dateFrom: null,
+      dateTo: null,
+    })
   }
 
   const handleCreate = async (e) => {
@@ -338,7 +349,7 @@ const PurchasePage = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-48 p-2" align="start">
-              <div className="space-y-1 max-h-60 overflow-y-auto" style={{scrollbarWidth : "none"}}>
+              <div className="space-y-1 max-h-60 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
                 {/* All Assets Option */}
                 <Button
                   variant="ghost"
@@ -417,7 +428,7 @@ const PurchasePage = () => {
           )}
 
           {/* Date Filter new */}
-          <Popover>
+          {/* <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -439,19 +450,75 @@ const PurchasePage = () => {
                 initialFocus
               />
             </PopoverContent>
-          </Popover>
+          </Popover> */}
 
-          {/* Date Filter */}
-          <div className="hidden flex items-center gap-1">
-            <Input
-              type="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className={cn(
-                "h-9 w-auto",
-                dateFilter && "border-primary/50 bg-primary/5"
-              )}
-            />
+          {/* Date Range New */}
+          <div className="flex items-center gap-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateFrom && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateFrom ? format(filters.dateFrom, "MMM dd") : "From"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateFrom}
+                  // onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  onSelect={(date) => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      dateFrom: date,
+                      dateTo: prev.dateTo && date && date > prev.dateTo ? null : prev.dateTo,
+                    }));
+                  }}
+
+                  initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates after dateTo
+                    return filters.dateTo ? date > filters.dateTo : false;
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-primary/50 text-sm">to</span>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateTo && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateTo ? format(filters.dateTo, "MMM dd") : "To"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateTo}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
+                  initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates before dateFrom
+                    return filters.dateFrom ? date < filters.dateFrom : false;
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <Separator orientation="vertical" className="h-6" />
