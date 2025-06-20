@@ -57,6 +57,7 @@ import { useAuth } from "../context/AuthContext"
 import { toast } from "sonner"
 import { Link } from "react-router-dom"
 import { format } from "date-fns"
+import InventorySkeleton from "../components/InventorySkeleton.jsx"
 
 const TransferPage = () => {
   const { assets, bases } = useAssetBase()
@@ -276,9 +277,7 @@ const TransferPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <InventorySkeleton />
     )
   }
 

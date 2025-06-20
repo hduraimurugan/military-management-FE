@@ -1,9 +1,7 @@
-"use client"
-
 import { useState, useEffect, useMemo } from "react"
 import { useAuth } from "../context/AuthContext"
 import { useNavigate } from "react-router-dom"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle ,CardFooter} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Calendar } from "@/components/ui/calendar"
@@ -29,6 +27,7 @@ import {
   BarChart3,
   PieChart,
   Eye,
+  RefreshCw,
 } from "lucide-react"
 import { format } from "date-fns"
 import { formatInTimeZone } from 'date-fns-tz'
@@ -36,6 +35,7 @@ import { cn } from "@/lib/utils"
 import { dataSummaryAPI } from "../services/api.js"
 import { useAssetBase } from "../context/AssetBaseContext"
 import { istTimeZone } from "../utils/constants.js"
+import DashboardSkeleton from "../components/DashboardSkeleton.jsx"
 
 const DashboardPage = () => {
   const { user, logout } = useAuth()
@@ -153,26 +153,34 @@ const DashboardPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <DashboardSkeleton />
     )
   }
 
   if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-96">
-          <CardHeader>
-            <CardTitle className="text-destructive">Error</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{error}</p>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
+  return (
+    <div className="flex items-start justify-center min-h-screen mt-10">
+      <Card className="w-full max-w-md shadow-xl border-destructive/40">
+        <CardHeader className="text-center">
+          <CardTitle className="text-destructive text-2xl">Something Went Wrong</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center">{error}</p>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <Button
+            variant="outline"
+            className="gap-2 hover:bg-primary/10"
+            onClick={() => window.location.reload()}
+          >
+            <RefreshCw className="w-4 h-4 animate-spin-on-hover" />
+            Refresh Page
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
 
   return (
     <div className="container mx-auto p-6 space-y-6">

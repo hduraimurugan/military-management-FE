@@ -44,6 +44,7 @@ import { useDebounce } from "use-debounce"
 import { useAuth } from "../context/AuthContext"
 import { useAssetBase } from "../context/AssetBaseContext"
 import { Link } from "react-router-dom"
+import InventorySkeleton from "../components/InventorySkeleton"
 
 const AssignmentPage = () => {
   const { user, isAdmin, isLogisticsOfficer, isCommander } = useAuth()
@@ -281,15 +282,13 @@ const AssignmentPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <InventorySkeleton />
     )
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-start justify-center min-h-screen mt-10">
         <Card className="w-96">
           <CardHeader>
             <CardTitle className="text-destructive">Error</CardTitle>

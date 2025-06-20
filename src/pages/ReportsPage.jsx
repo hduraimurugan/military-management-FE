@@ -33,6 +33,7 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { movementAPI } from "../services/api"
 import { useAssetBase } from "../context/AssetBaseContext"
+import InventorySkeleton from "../components/InventorySkeleton"
 
 const ReportsPage = () => {
   const { assets } = useAssetBase()
@@ -273,9 +274,7 @@ const ReportsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <InventorySkeleton />
     )
   }
 

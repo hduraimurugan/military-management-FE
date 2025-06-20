@@ -53,6 +53,7 @@ import { getRoleColor, getRoleLabel } from "../utils/roleColorLabel.js"
 import { Link } from "react-router-dom"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
+import InventorySkeleton from "../components/InventorySkeleton.jsx"
 
 const ExpendituresPage = () => {
   const { assets, bases } = useAssetBase()
@@ -280,9 +281,7 @@ const ExpendituresPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <InventorySkeleton />
     )
   }
 

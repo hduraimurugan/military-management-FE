@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar"
 import { BiPurchaseTag } from "react-icons/bi";
+import InventorySkeleton from "../components/InventorySkeleton";
 
 const PurchasePage = () => {
   const { assets, bases } = useAssetBase()
@@ -267,9 +268,7 @@ const PurchasePage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <InventorySkeleton />
     )
   }
 

@@ -15,6 +15,7 @@ import ExpendituresPage from './pages/ExpendituresPage.jsx';
 import StocksPage from './pages/StocksPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import { useAuth } from './context/AuthContext.jsx'
+import { LoadingPage } from './pages/LoadingPage.jsx'
 
 function App() {
   const { user } = useAuth();
@@ -31,6 +32,7 @@ function App() {
               <Layout />
             </ProtectedRoute>}>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/loading" element={<LoadingPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             <Route path="/stocks" element={<StocksPage />} />
             <Route path="/reports" element={<ReportsPage />} />
