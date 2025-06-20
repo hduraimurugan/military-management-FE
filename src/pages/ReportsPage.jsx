@@ -300,7 +300,7 @@ const ReportsPage = () => {
       <div className="flex md:flex-row flex-col md:items-center md:justify-between gap-2">
         <div>
           <h1 className="md:text-3xl text-xl font-bold tracking-tight flex items-center gap-2">
-            <IoMdMove className="h-8 w-8" />
+            <IoMdMove className="md:h-7 md:w-7 h-6 w-6" />
             Movement Reports
           </h1>
           <p className="text-muted-foreground">Track all asset movements, assignments, and expenditures</p>
@@ -354,8 +354,8 @@ const ReportsPage = () => {
         </div>
       </div>
 
-      {/* Compact Filters */}
-      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm">
+      {/* Mob Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm block md:hidden">
         {/* Header */}
         <div className="flex items-center justify-between mb-0">
           <div className="flex items-center gap-2">
@@ -379,19 +379,7 @@ const ReportsPage = () => {
         </div>
 
         {/* Compact Filter Controls */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Search */}
-          {/* <div className="relative min-w-[200px] flex-1 max-w-xs">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Search movements..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
-            />
-          </div> */}
-
-          <Separator orientation="vertical" className="h-6" />
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none px-1 py-3">
 
           {/* Asset Filter */}
           <Popover>
@@ -450,7 +438,197 @@ const ReportsPage = () => {
             </PopoverTrigger>
             <PopoverContent className="w-48 p-2" align="start">
               <div className="space-y-1 capitalize">
-                {["All types", "purchase", "transfer" , "assignment", "expenditure"].map((type) => (
+                {["All types", "purchase", "transfer", "assignment", "expenditure"].map((type) => (
+                  <Button
+                    key={type}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm ",
+                      filters.actionType === type && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setFilters((prev) => ({ ...prev, actionType: type }))}
+                  >
+                    {type}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Date Range */}
+          <div className="flex items-center gap-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn("h-9", filters.dateFrom && "border-primary/50 bg-primary/5")}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateFrom ? format(filters.dateFrom, "MMM dd") : "From"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateFrom}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-primary/50 text-sm">to</span>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn("h-9", filters.dateTo && "border-primary/50 bg-primary/5")}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateTo ? format(filters.dateTo, "MMM dd") : "To"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateTo}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+
+        {/* Active Filters Display */}
+        {activeFiltersCount > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+            <span className="text-xs text-primary/50 font-medium">Active filters:</span>
+            {searchTerm && (
+              <Badge variant="secondary" className="text-xs">
+                Search: {searchTerm}
+                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
+              </Badge>
+            )}
+            {filters.actionType !== "All types" && (
+              <Badge variant="secondary" className="text-xs">
+                {filters.actionType}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, actionType: "All types" }))}
+                />
+              </Badge>
+            )}
+            {filters.dateFrom && (
+              <Badge variant="secondary" className="text-xs">
+                From: {format(filters.dateFrom, "MMM dd")}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, dateFrom: null }))}
+                />
+              </Badge>
+            )}
+            {filters.dateTo && (
+              <Badge variant="secondary" className="text-xs">
+                To: {format(filters.dateTo, "MMM dd")}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, dateTo: null }))}
+                />
+              </Badge>
+            )}
+          </div>
+        )}
+      </Card>
+
+      {/* Web Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm hidden md:block">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filters
+            </CardTitle>
+            {activeFiltersCount > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {activeFiltersCount} active
+              </Badge>
+            )}
+          </div>
+
+          {activeFiltersCount > 0 && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2">
+              <X className="h-3 w-3 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Compact Filter Controls */}
+        <div className="flex flex-wrap items-center gap-2 py-2">
+          {/* Asset Filter */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Package className="h-3 w-3 mr-2" />
+                {selectedAssetFilter && selectedAssetFilter !== "all"
+                  ? getAssetById(selectedAssetFilter)?.name
+                  : "Asset"}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1 max-h-60 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                {/* All Assets Option */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start h-8 text-sm",
+                    (!selectedAssetFilter || selectedAssetFilter === null) && "bg-primary/10 text-primary"
+                  )}
+                  onClick={() => setSelectedAssetFilter(null)}
+                >
+                  All assets
+                </Button>
+
+                {/* Asset Buttons */}
+                {assets.map((asset) => (
+                  <Button
+                    key={asset._id}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      selectedAssetFilter === asset._id && "bg-primary/10 text-primary"
+                    )}
+                    onClick={() => setSelectedAssetFilter(asset._id)}
+                  >
+                    {asset.name}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+
+          </Popover>
+
+          {/* Action Type */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Tag className="h-3 w-3 mr-2" />
+                {filters.actionType === "All types" ? "Action Type" : filters.actionType}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1 capitalize">
+                {["All types", "purchase", "transfer", "assignment", "expenditure"].map((type) => (
                   <Button
                     key={type}
                     variant="ghost"
@@ -563,7 +741,7 @@ const ReportsPage = () => {
           <CardTitle>Movement Logs</CardTitle>
           <CardDescription>Complete history of all asset movements and transactions</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className='p-3 py-0'>
           <div className="rounded-md border">
             <Table>
               <TableHeader>
@@ -659,24 +837,35 @@ const ReportsPage = () => {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between px-2 py-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-2 py-4 w-full">
+
+              {/* Pagination Summary */}
               <div className="text-sm text-muted-foreground">
-                Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-                {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+                Showing{" "}
+                {(pagination.page - 1) * pagination.limit + 1} to{" "}
+                {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
+                {pagination.total} results
               </div>
-              <div className="flex items-center space-x-2">
+
+              {/* Controls */}
+              <div className="flex flex-wrap items-center gap-2 md:justify-end w-full md:w-auto">
+
+                {/* Previous Button */}
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={pagination.page <= 1}
+                  className="flex items-center gap-1"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <span className="hidden sm:inline">Previous</span>
                 </Button>
-                <div className="flex items-center space-x-1">
+
+                {/* Page Numbers */}
+                <div className="flex items-center gap-1">
                   {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                    const pageNum = i + 1
+                    const pageNum = i + 1;
                     return (
                       <Button
                         key={pageNum}
@@ -687,21 +876,25 @@ const ReportsPage = () => {
                       >
                         {pageNum}
                       </Button>
-                    )
+                    );
                   })}
                 </div>
+
+                {/* Next Button */}
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page >= pagination.totalPages}
+                  className="flex items-center gap-1"
                 >
-                  Next
+                  <span className="hidden sm:inline">Next</span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           )}
+
         </CardContent>
       </Card>
     </div>

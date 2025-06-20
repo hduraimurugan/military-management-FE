@@ -200,7 +200,7 @@ export default function UsersPage() {
               <CardTitle>Users Directory</CardTitle>
               <CardDescription>View and manage all system users and their assignments</CardDescription>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="hidden md:flex items-center space-x-2">
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -213,7 +213,7 @@ export default function UsersPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className='p-3 py-0'>
           <UsersTable
             users={filteredUsers}
             bases={bases}

@@ -314,7 +314,7 @@ const AssignmentPage = () => {
             {baseInfo ? `${baseInfo.district}, ${baseInfo.state}` : "Manage asset assignments"}
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 overflow-x-auto scrollbar-none">
           {expendedAssignments > 0 && (
             <Badge variant="secondary" className="flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3" />
@@ -325,7 +325,7 @@ const AssignmentPage = () => {
 
           <Button variant="outline" asChild>
             <Link to="/stocks">
-              <Package className="mr-2 h-4 w-4" />
+              <Package className="mr-0 h-4 w-4" />
               View Stocks
             </Link>
           </Button>
@@ -335,7 +335,7 @@ const AssignmentPage = () => {
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="mr-0 h-4 w-4" />
-                  Assign Assets
+                  Assign
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -468,48 +468,8 @@ const AssignmentPage = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Assignments</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalAssignments}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Assignments</CardTitle>
-            <Clock className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{activeAssignments}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expended</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{expendedAssignments}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Items Assigned</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalItemsAssigned}</div>
-          </CardContent>
-        </Card>
-      </div> */}
-
-      {/* Filters */}
-      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm">
+      {/* Mob Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm block md:hidden">
         <div className="flex items-center justify-between mb-0">
           <div className="flex items-center gap-2">
             <CardTitle className="flex items-center gap-2">
@@ -531,19 +491,272 @@ const AssignmentPage = () => {
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Search */}
-          {/* <div className="relative min-w-[200px] flex-1 max-w-xs">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input
-              placeholder="Search by assigned to..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 h-9 focus:border-primary/50 focus:ring-primary/20"
-            />
-          </div> */}
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none px-1 py-2">
 
-          <Separator orientation="vertical" className="h-6" />
+          {/* Asset Filter */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Package className="h-3 w-3 mr-2" />
+                {selectedAssetFilter && selectedAssetFilter !== "all"
+                  ? getAssetById(selectedAssetFilter)?.name
+                  : "Asset"}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1 max-h-60 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                {/* All Assets Option */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start h-8 text-sm",
+                    (!selectedAssetFilter || selectedAssetFilter === null) && "bg-primary/10 text-primary"
+                  )}
+                  onClick={() => setSelectedAssetFilter(null)}
+                >
+                  All assets
+                </Button>
+
+                {/* Asset Buttons */}
+                {assets.map((asset) => (
+                  <Button
+                    key={asset._id}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      selectedAssetFilter === asset._id && "bg-primary/10 text-primary"
+                    )}
+                    onClick={() => setSelectedAssetFilter(asset._id)}
+                  >
+                    {asset.name}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+
+          </Popover>
+
+          {/* Status */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Tag className="h-3 w-3 mr-2" />
+                {filters.status === "All statuses" ? "Status" : filters.status}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1">
+                {["All statuses", "Active", "Expended"].map((status) => (
+                  <Button
+                    key={status}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      filters.status === status && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setFilters((prev) => ({ ...prev, status }))}
+                  >
+                    {status}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Base Selector (Admin Only) */}
+          {isAdmin && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <Building2 className="h-3 w-3 mr-2" />
+                  {filters.base_id === "All bases" || !filters.base_id
+                    ? "Base"
+                    : bases.find((b) => b._id === filters.base_id)?.name}
+                  <ChevronDown className="h-3 w-3 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start">
+                <div className="space-y-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      (filters.base_id === "All bases" || !filters.base_id) && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setFilters((prev) => ({ ...prev, base_id: "All bases" }))}
+                  >
+                    All bases
+                  </Button>
+                  {bases.map((base) => (
+                    <Button
+                      key={base._id}
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        filters.base_id === base._id && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setFilters((prev) => ({ ...prev, base_id: base._id }))}
+                    >
+                      {base.name}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {/* Date Range New */}
+          <div className="flex items-center gap-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateFrom && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateFrom ? format(filters.dateFrom, "MMM dd") : "From"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateFrom}
+                  // onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  onSelect={(date) => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      dateFrom: date,
+                      dateTo: prev.dateTo && date && date > prev.dateTo ? null : prev.dateTo,
+                    }));
+                  }}
+
+                  initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates after dateTo
+                    return filters.dateTo ? date > filters.dateTo : false;
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-primary/50 text-sm">to</span>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateTo && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateTo ? format(filters.dateTo, "MMM dd") : "To"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateTo}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
+                  initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates before dateFrom
+                    return filters.dateFrom ? date < filters.dateFrom : false;
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+        </div>
+
+        {/* Active Filters Display */}
+        {activeFiltersCount > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+            <span className="text-xs text-primary/50 font-medium">Active filters:</span>
+            {searchTerm && (
+              <Badge variant="secondary" className="text-xs">
+                Search: {searchTerm}
+                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
+              </Badge>
+            )}
+            {filters.status !== "All statuses" && (
+              <Badge variant="secondary" className="text-xs">
+                {filters.status}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, status: "All statuses" }))}
+                />
+              </Badge>
+            )}
+            {filters.base_id && filters.base_id !== "All bases" && (
+              <Badge variant="secondary" className="text-xs">
+                {bases.find((b) => b._id === filters.base_id)?.name}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, base_id: "All bases" }))}
+                />
+              </Badge>
+            )}
+            {filters.dateFrom && (
+              <Badge variant="secondary" className="text-xs">
+                From: {format(filters.dateFrom, "MMM dd")}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, dateFrom: null }))}
+                />
+              </Badge>
+            )}
+            {filters.dateTo && (
+              <Badge variant="secondary" className="text-xs">
+                To: {format(filters.dateTo, "MMM dd")}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, dateTo: null }))}
+                />
+              </Badge>
+            )}
+          </div>
+        )}
+      </Card>
+
+      {/*Web Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm md:block hidden">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filters
+            </CardTitle>
+            {activeFiltersCount > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {activeFiltersCount} active
+              </Badge>
+            )}
+          </div>
+
+          {activeFiltersCount > 0 && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2">
+              <X className="h-3 w-3 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
 
           {/* Asset Filter */}
           <Popover>

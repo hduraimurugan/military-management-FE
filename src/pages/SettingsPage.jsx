@@ -30,11 +30,11 @@ const baseColumns = [
 
 export const SettingsPage = () => {
   const {
-  assets,
-  bases,
-  loading,
-  fetchData,
-} = useAssetBase()
+    assets,
+    bases,
+    loading,
+    fetchData,
+  } = useAssetBase()
 
   console.log("Assets", assets);
   console.log("Bases", bases);
@@ -59,14 +59,14 @@ export const SettingsPage = () => {
   })
 
   // Fetch data on component mount only if data doesn't exist
- useEffect(() => {
-  if (
-    (!assets || assets.length === 0) &&
-    (!bases || bases.length === 0)
-  ) {
-    fetchData();
-  }
-}, [assets, bases]);
+  useEffect(() => {
+    if (
+      (!assets || assets.length === 0) &&
+      (!bases || bases.length === 0)
+    ) {
+      fetchData();
+    }
+  }, [assets, bases]);
 
 
 
@@ -103,7 +103,7 @@ export const SettingsPage = () => {
 
       } else {
         await assetsAPI.update(assetModal.data._id, formData)
-       toast("Asset updated successfully", "success")
+        toast("Asset updated successfully", "success")
 
       }
       setAssetModal({ isOpen: false, mode: "create", data: null })
@@ -163,11 +163,11 @@ export const SettingsPage = () => {
     try {
       if (deleteModal.type === "asset") {
         await assetsAPI.delete(deleteModal.data._id)
-       toast("Asset deleted successfully", "success")
+        toast("Asset deleted successfully", "success")
 
       } else {
         await basesAPI.delete(deleteModal.data._id)
-       toast("Base deleted successfully", "success")
+        toast("Base deleted successfully", "success")
 
       }
       setDeleteModal({ isOpen: false, type: "", data: null })
@@ -190,7 +190,7 @@ export const SettingsPage = () => {
     <div className="container mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <h1 className="md:text-3xl text-xl font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground">Manage your assets and bases configuration</p>
         </div>
       </div>
@@ -210,21 +210,30 @@ export const SettingsPage = () => {
         <TabsContent value="assets" className="space-y-6">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                {/* Title and Description */}
                 <div>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                     <Package className="h-5 w-5" />
                     Assets Management
                   </CardTitle>
-                  <CardDescription>Manage your asset inventory and track their details</CardDescription>
+                  <CardDescription className="text-sm sm:text-base">
+                    Manage your asset inventory and track their details
+                  </CardDescription>
                 </div>
-                <Button onClick={handleCreateAsset} className="flex items-center gap-2">
+
+                {/* Action Button */}
+                <Button
+                  onClick={handleCreateAsset}
+                  className="flex items-center gap-2 w-full sm:w-auto"
+                >
                   <Plus className="h-4 w-4" />
                   Create Asset
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+
+            <CardContent className='md:px-4 p-3 py-0'>
               <DataTable columns={assetColumns} data={assets} onEdit={handleEditAsset} onDelete={handleDeleteAsset} />
             </CardContent>
           </Card>
@@ -233,21 +242,30 @@ export const SettingsPage = () => {
         <TabsContent value="bases" className="space-y-6">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                {/* Left Side - Title & Description */}
                 <div>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                     <Database className="h-5 w-5" />
                     Bases Management
                   </CardTitle>
-                  <CardDescription>Configure and manage your operational bases</CardDescription>
+                  <CardDescription className="text-sm sm:text-base">
+                    Configure and manage your operational bases
+                  </CardDescription>
                 </div>
-                <Button onClick={handleCreateBase} className="flex items-center gap-2">
+
+                {/* Right Side - Create Button */}
+                <Button
+                  onClick={handleCreateBase}
+                  className="flex items-center gap-2 w-full sm:w-auto"
+                >
                   <Plus className="h-4 w-4" />
                   Create Base
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+
+            <CardContent className='md:px-4 p-3 py-0'>
               <DataTable columns={baseColumns} data={bases} onEdit={handleEditBase} onDelete={handleDeleteBase} />
             </CardContent>
           </Card>

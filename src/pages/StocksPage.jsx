@@ -173,7 +173,7 @@ const StocksPage = () => {
       <div className="flex md:flex-row flex-col md:items-center md:justify-between gap-2">
         <div>
           <h1 className="md:text-3xl text-xl font-bold tracking-tight flex items-center gap-2">
-            <Package className="h-8 w-8" />
+            <Package className="md:h-7 md:w-7 h-6 w-6" />
             {baseInfo ? `${baseInfo.name} Inventory` : "Inventory Management"}
           </h1>
           <p className="text-muted-foreground">
@@ -191,50 +191,269 @@ const StocksPage = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="hidden grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Items</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{inventoryData.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Quantity</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{inventoryData.reduce((sum, item) => sum + item.quantity, 0)}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">{lowStockCount}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Assigned</CardTitle>
-            <TrendingDown className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{inventoryData.reduce((sum, item) => sum + item.assigned, 0)}</div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Mob view Compact Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm block md:hidden">
 
-      {/* Compact Filters */}
-      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm">
         {/* Header */}
         <div className="flex items-center justify-between mb-0">
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filters
+            </CardTitle>
+            {activeFiltersCount > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {activeFiltersCount} active
+              </Badge>
+            )}
+          </div>
+
+          {activeFiltersCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className=" h-8 px-2"
+            >
+              <X className="h-3 w-3 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Compact Filter Controls */}
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none px-1 py-2">
+
+          {/* Search */}
+          {/* <div className="relative min-w-[200px] flex-1 max-w-xs">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search assets..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 h-9  focus:border-primary/50 focus:ring-primary/20"
+            />
+          </div> */}
+
+          {/* Category */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 ">
+                <Tag className="h-3 w-3 mr-2" />
+                {filters.category === "All categories" ? "Category" : filters.category}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1">
+                {["All categories", "weapon", "vehicle", "ammunition", "equipment"].map((category) => (
+                  <Button
+                    key={category}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      filters.category === category && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setFilters((prev) => ({ ...prev, category }))}
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Base Selector (Admin Only) */}
+          {isAdmin && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9 ">
+                  <Building2 className="h-3 w-3 mr-2" />
+                  {filters.base_id === "All bases" || !filters.base_id
+                    ? "Base"
+                    : bases.find((b) => b._id === filters.base_id)?.name}
+                  <ChevronDown className="h-3 w-3 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start">
+                <div className="space-y-1">
+                  {/* <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      (filters.base_id === "All bases" || !filters.base_id) && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setFilters((prev) => ({ ...prev, base_id: "All bases" }))}
+                  >
+                    All bases
+                  </Button> */}
+                  {bases.map((base) => (
+                    <Button
+                      key={base._id}
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        filters.base_id === base._id && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setFilters((prev) => ({ ...prev, base_id: base._id }))}
+                    >
+                      {base.name}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {/* Date Range New */}
+          <div className="flex items-center gap-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateFrom && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateFrom ? format(filters.dateFrom, "MMM dd") : "From"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateFrom}
+                  // onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  onSelect={(date) => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      dateFrom: date,
+                      dateTo: prev.dateTo && date && date > prev.dateTo ? null : prev.dateTo,
+                    }));
+                  }}
+
+                  initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates after dateTo
+                    return filters.dateTo ? date > filters.dateTo : false;
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-primary/50 text-sm">to</span>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateTo && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateTo ? format(filters.dateTo, "MMM dd") : "To"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateTo}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
+                  initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates before dateFrom
+                    return filters.dateFrom ? date < filters.dateFrom : false;
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <Separator orientation="vertical" className="h-6" />
+
+          {/* Low Stock Toggle */}
+          <Button
+            variant={filters.showLowStock ? "destructive" : "outline"}
+            size="sm"
+            onClick={() => setFilters((prev) => ({ ...prev, showLowStock: !prev.showLowStock }))}
+            className={cn("h-9", !filters.showLowStock && "")}
+          >
+            <AlertTriangle className="h-3 w-3 mr-2" />
+            Low Stock
+          </Button>
+        </div>
+
+        {/* Active Filters Display */}
+        {activeFiltersCount > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+            <span className="text-xs text-primary/50 font-medium">Active filters:</span>
+            {searchTerm && (
+              <Badge variant="secondary" className="text-xs">
+                Search: {searchTerm}
+                <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
+              </Badge>
+            )}
+            {filters.category !== "All categories" && (
+              <Badge variant="secondary" className="text-xs">
+                {filters.category}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, category: "All categories" }))}
+                />
+              </Badge>
+            )}
+            {filters.base_id && filters.base_id !== "All bases" && (
+              <Badge variant="secondary" className="text-xs">
+                {bases.find((b) => b._id === filters.base_id)?.name}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, base_id: "All bases" }))}
+                />
+              </Badge>
+            )}
+            {filters.dateFrom && (
+              <Badge variant="secondary" className="text-xs">
+                From: {format(filters.dateFrom, "MMM dd")}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, dateFrom: null }))}
+                />
+              </Badge>
+            )}
+            {filters.dateTo && (
+              <Badge variant="secondary" className="text-xs">
+                To: {format(filters.dateTo, "MMM dd")}
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, dateTo: null }))}
+                />
+              </Badge>
+            )}
+            {filters.showLowStock && (
+              <Badge variant="destructive" className="text-xs">
+                Low Stock
+                <X
+                  className="h-3 w-3 ml-1 cursor-pointer"
+                  onClick={() => setFilters((prev) => ({ ...prev, showLowStock: false }))}
+                />
+              </Badge>
+            )}
+          </div>
+        )}
+      </Card>
+
+      {/* Web Compact Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm md:block hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
@@ -496,7 +715,7 @@ const StocksPage = () => {
           <CardTitle>Inventory Data</CardTitle>
           <CardDescription>Complete overview of your asset inventory with detailed metrics</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className='p-3 py-0'>
           <div className="rounded-md border">
             <Table>
               <TableHeader>

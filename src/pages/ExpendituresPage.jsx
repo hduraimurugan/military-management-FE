@@ -291,8 +291,8 @@ const ExpendituresPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <DollarSign className="h-8 w-8" />
+          <h1 className="md:text-3xl text-xl font-bold flex items-center gap-2">
+            <DollarSign className="md:h-7 md:w-7 h-6 w-6" />
             Expenditure Management
           </h1>
           <p className="text-muted-foreground mt-1">Track and manage asset expenditures</p>
@@ -321,8 +321,256 @@ const ExpendituresPage = () => {
         </Card>
       )}
 
-      {/* Compact Filters */}
-      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm">
+      {/* Mob Compact Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm block md:hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filters
+            </CardTitle>
+            {(searchTerm ||
+              (selectedAssetFilter && selectedAssetFilter !== "all") ||
+              (selectedBaseFilter && selectedBaseFilter !== "all") ||
+              expendedByFilter ||
+              dateFilter) && (
+                <Badge variant="secondary" className="text-xs">
+                  {
+                    [
+                      searchTerm,
+                      selectedAssetFilter && selectedAssetFilter !== "all",
+                      selectedBaseFilter && selectedBaseFilter !== "all",
+                      expendedByFilter,
+                      dateFilter,
+                    ].filter(Boolean).length
+                  }{" "}
+                  active
+                </Badge>
+              )}
+          </div>
+
+          {(searchTerm ||
+            (selectedAssetFilter && selectedAssetFilter !== "all") ||
+            (selectedBaseFilter && selectedBaseFilter !== "all") ||
+            expendedByFilter ||
+            dateFilter) && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2">
+                <X className="h-3 w-3 mr-1" />
+                Clear
+              </Button>
+            )}
+        </div>
+
+        {/* Compact Filter Controls */}
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none px-1 py-2">
+
+          {/* Asset Filter */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9">
+                <Package className="h-3 w-3 mr-2" />
+                {selectedAssetFilter && selectedAssetFilter !== "all"
+                  ? getAssetById(selectedAssetFilter)?.name
+                  : "Asset"}
+                <ChevronDown className="h-3 w-3 ml-2" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <div className="space-y-1 max-h-60 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                {/* All Assets Option */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start h-8 text-sm",
+                    (!selectedAssetFilter || selectedAssetFilter === null) && "bg-primary/10 text-primary"
+                  )}
+                  onClick={() => setSelectedAssetFilter(null)}
+                >
+                  All assets
+                </Button>
+
+                {/* Asset Buttons */}
+                {assets.map((asset) => (
+                  <Button
+                    key={asset._id}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      selectedAssetFilter === asset._id && "bg-primary/10 text-primary"
+                    )}
+                    onClick={() => setSelectedAssetFilter(asset._id)}
+                  >
+                    {asset.name}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+
+          </Popover>
+
+          {/* Base Filter (Admin Only) */}
+          {isAdmin && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <MapPin className="h-3 w-3 mr-2" />
+                  {selectedBaseFilter && selectedBaseFilter !== "all"
+                    ? bases.find((b) => b._id === selectedBaseFilter)?.name
+                    : "Base"}
+                  <ChevronDown className="h-3 w-3 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start">
+                <div className="space-y-1">
+                  {/* <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      (!selectedBaseFilter || selectedBaseFilter === "all") && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setSelectedBaseFilter("all")}
+                  >
+                    All bases
+                  </Button> */}
+                  {bases.map((base) => (
+                    <Button
+                      key={base._id}
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        selectedBaseFilter === base._id && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setSelectedBaseFilter(base._id)}
+                    >
+                      {base.name}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {/* Date Range New */}
+          <div className="flex items-center gap-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateFrom && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateFrom ? format(filters.dateFrom, "MMM dd") : "From"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateFrom}
+                  // onSelect={(date) => setFilters((prev) => ({ ...prev, dateFrom: date }))}
+                  onSelect={(date) => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      dateFrom: date,
+                      dateTo: prev.dateTo && date && date > prev.dateTo ? null : prev.dateTo,
+                    }));
+                  }}
+
+                  initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates after dateTo
+                    return filters.dateTo ? date > filters.dateTo : false;
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-primary/50 text-sm">to</span>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 ",
+                    filters.dateTo && "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <CalendarIcon className="h-3 w-3 mr-2" />
+                  {filters.dateTo ? format(filters.dateTo, "MMM dd") : "To"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filters.dateTo}
+                  onSelect={(date) => setFilters((prev) => ({ ...prev, dateTo: date }))}
+                  initialFocus
+                  disabled={(date) => {
+                    // ❌ Disable all dates before dateFrom
+                    return filters.dateFrom ? date < filters.dateFrom : false;
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <Separator orientation="vertical" className="h-6" />
+        </div>
+
+        {/* Active Filters Display */}
+        {(searchTerm ||
+          (selectedAssetFilter && selectedAssetFilter !== "all") ||
+          (selectedBaseFilter && selectedBaseFilter !== "all") ||
+          expendedByFilter ||
+          dateFilter) && (
+            <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-primary/20">
+              <span className="text-xs text-primary/50 font-medium">Active filters:</span>
+              {searchTerm && (
+                <Badge variant="secondary" className="text-xs">
+                  Search: {searchTerm}
+                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSearchTerm("")} />
+                </Badge>
+              )}
+              {selectedAssetFilter && selectedAssetFilter !== "all" && (
+                <Badge variant="secondary" className="text-xs">
+                  {getAssetById(selectedAssetFilter)?.name}
+                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedAssetFilter("all")} />
+                </Badge>
+              )}
+              {selectedBaseFilter && selectedBaseFilter !== "all" && (
+                <Badge variant="secondary" className="text-xs">
+                  {bases.find((b) => b._id === selectedBaseFilter)?.name}
+                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setSelectedBaseFilter("all")} />
+                </Badge>
+              )}
+              {expendedByFilter && (
+                <Badge variant="secondary" className="text-xs">
+                  By: {expendedByFilter}
+                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setExpendedByFilter("")} />
+                </Badge>
+              )}
+              {dateFilter && (
+                <Badge variant="secondary" className="text-xs">
+                  Date: {formatDate(dateFilter)}
+                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setDateFilter("")} />
+                </Badge>
+              )}
+            </div>
+          )}
+      </Card>
+
+      {/* Web Compact Filters */}
+      <Card className="bg-secondary/50 rounded-xl p-4 shadow-sm md:block hidden">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -672,16 +920,26 @@ const ExpendituresPage = () => {
       {filteredExpenditures.length > 0 && (
         <Card>
           <CardContent className="py-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 w-full">
+
+              {/* Pagination Summary */}
               <div className="text-sm text-muted-foreground">
                 Showing{" "}
-                <span className="font-medium">{(expenditureData.currentPage - 1) * expenditureData.limit + 1}</span> to{" "}
+                <span className="font-medium">
+                  {(expenditureData.currentPage - 1) * expenditureData.limit + 1}
+                </span>{" "}
+                to{" "}
                 <span className="font-medium">
                   {Math.min(expenditureData.currentPage * expenditureData.limit, expenditureData.total)}
                 </span>{" "}
-                of <span className="font-medium">{expenditureData.total}</span> expenditures
+                of{" "}
+                <span className="font-medium">{expenditureData.total}</span> expenditures
               </div>
-              <div className="flex items-center space-x-2">
+
+              {/* Pagination Controls */}
+              <div className="flex flex-wrap items-center gap-3 justify-between md:justify-end w-full md:w-auto">
+
+                {/* Page Size Selector */}
                 <div className="flex items-center space-x-2">
                   <Select
                     value={expenditureData.limit.toString()}
@@ -690,7 +948,7 @@ const ExpendituresPage = () => {
                         ...prev,
                         limit: Number(value),
                         currentPage: 1,
-                      }))
+                      }));
                     }}
                   >
                     <SelectTrigger className="h-8 w-[70px]">
@@ -706,7 +964,9 @@ const ExpendituresPage = () => {
                   </Select>
                   <p className="text-sm font-medium">per page</p>
                 </div>
-                <div className="flex space-x-2">
+
+                {/* Navigation Buttons */}
+                <div className="flex space-x-1 flex-shrink-0">
                   <Button
                     variant="outline"
                     className="h-8 w-8 p-0"
@@ -718,7 +978,12 @@ const ExpendituresPage = () => {
                   <Button
                     variant="outline"
                     className="h-8 w-8 p-0"
-                    onClick={() => setExpenditureData((prev) => ({ ...prev, currentPage: prev.currentPage - 1 }))}
+                    onClick={() =>
+                      setExpenditureData((prev) => ({
+                        ...prev,
+                        currentPage: prev.currentPage - 1,
+                      }))
+                    }
                     disabled={expenditureData.currentPage === 1}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -726,9 +991,15 @@ const ExpendituresPage = () => {
                   <Button
                     variant="outline"
                     className="h-8 w-8 p-0"
-                    onClick={() => setExpenditureData((prev) => ({ ...prev, currentPage: prev.currentPage + 1 }))}
+                    onClick={() =>
+                      setExpenditureData((prev) => ({
+                        ...prev,
+                        currentPage: prev.currentPage + 1,
+                      }))
+                    }
                     disabled={
-                      expenditureData.currentPage === expenditureData.totalPages || expenditureData.totalPages === 0
+                      expenditureData.currentPage === expenditureData.totalPages ||
+                      expenditureData.totalPages === 0
                     }
                   >
                     <ChevronRight className="h-4 w-4" />
@@ -736,9 +1007,15 @@ const ExpendituresPage = () => {
                   <Button
                     variant="outline"
                     className="h-8 w-8 p-0"
-                    onClick={() => setExpenditureData((prev) => ({ ...prev, currentPage: expenditureData.totalPages }))}
+                    onClick={() =>
+                      setExpenditureData((prev) => ({
+                        ...prev,
+                        currentPage: expenditureData.totalPages,
+                      }))
+                    }
                     disabled={
-                      expenditureData.currentPage === expenditureData.totalPages || expenditureData.totalPages === 0
+                      expenditureData.currentPage === expenditureData.totalPages ||
+                      expenditureData.totalPages === 0
                     }
                   >
                     <ChevronsRight className="h-4 w-4" />
@@ -749,6 +1026,7 @@ const ExpendituresPage = () => {
           </CardContent>
         </Card>
       )}
+
 
       {/* Create Expenditure Modal */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
