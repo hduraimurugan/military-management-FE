@@ -1083,7 +1083,7 @@ const AssignmentPage = () => {
                           <Eye className="h-3 w-3 mr-1" />
                           View
                         </Button>
-                        {(isAdmin || isCommander) && (
+                        {/* {(isAdmin || isCommander) && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -1096,7 +1096,7 @@ const AssignmentPage = () => {
                             <Trash2 className="h-3 w-3 mr-1" />
                             Delete
                           </Button>
-                        )}
+                        )} */}
                       </div>
                     </TableCell>
                   </TableRow>

@@ -50,7 +50,7 @@ const DashboardPage = () => {
 
   // Filter states
   const [filters, setFilters] = useState({
-    date: Date.now(),
+    date: Date.now() - 24 * 60 * 60 * 1000,
     dateFrom: null,
     dateTo: null,
     category: "All categories",
@@ -393,7 +393,7 @@ const DashboardPage = () => {
             </Popover>
           )}
 
-          {/* Date Range */}
+          {/* Date */}
           <div className="flex items-center gap-1">
             <Popover>
               <PopoverTrigger asChild>

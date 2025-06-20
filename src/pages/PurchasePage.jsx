@@ -816,9 +816,9 @@ const PurchasePage = () => {
                       <Button variant="ghost" size="sm" onClick={() => openEditModal(purchase)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => openDeleteModal(purchase)}>
+                      {/* <Button variant="ghost" size="sm" onClick={() => openDeleteModal(purchase)}>
                         <Trash2 className="h-4 w-4" />
-                      </Button>
+                      </Button> */}
                     </div>
                   </TableCell>
                 </TableRow>

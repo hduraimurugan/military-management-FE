@@ -965,9 +965,9 @@ const TransferPage = () => {
                           <Button variant="ghost" size="sm" onClick={() => openViewModal(transfer)}>
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => openDeleteModal(transfer)}>
+                          {/* <Button variant="ghost" size="sm" onClick={() => openDeleteModal(transfer)}>
                             <Trash2 className="h-4 w-4" />
-                          </Button>
+                          </Button> */}
                         </div>
                       </TableCell>
                     </TableRow>

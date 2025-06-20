@@ -892,9 +892,9 @@ const ExpendituresPage = () => {
                       <Button variant="ghost" size="sm" onClick={() => openViewModal(expenditure)}>
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => openDeleteModal(expenditure)}>
+                      {/* <Button variant="ghost" size="sm" onClick={() => openDeleteModal(expenditure)}>
                         <Trash2 className="h-4 w-4" />
-                      </Button>
+                      </Button> */}
                     </div>
                   </TableCell>
                 </TableRow>
