@@ -20,6 +20,7 @@ import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { useAuth } from "../context/AuthContext"
 import { toast } from "sonner"
+import { FaPersonMilitaryRifle } from "react-icons/fa6"
 
 const demoCredentials = [
   {
@@ -129,8 +130,8 @@ export const LoginPage = () => {
 
       <div className="relative w-full max-w-md">
         <Card className="shadow-2xl border-0 bg-secondary/20 backdrop-blur-xl">
-          <CardHeader className="space-y-4 text-center pb-8">
-            <div className="flex justify-center">
+          <CardHeader className="space-y-4 text-center py-2">
+            <div className="hidden flex justify-center">
               <div className="relative">
                 <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-lg">
                   <Shield className="w-8 h-8 text-primary" />
@@ -145,9 +146,11 @@ export const LoginPage = () => {
             </div>
 
             <div className="space-y-2">
-              <CardTitle className="md:text-2xl text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
-                Military Asset & Inventory
+              <CardTitle className="md:text-2xl text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                <FaPersonMilitaryRifle className="h-5 w-5 text-primary" />
+                <span>Military Asset & Inventory</span>
               </CardTitle>
+
               <CardDescription className="text-slate-600 dark:text-slate-400">
                 Secure access to military asset management system
               </CardDescription>
