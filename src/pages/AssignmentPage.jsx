@@ -67,7 +67,7 @@ const AssignmentPage = () => {
   const [selectedItems, setSelectedItems] = useState([])
 
   const [selectedAssetFilter, setSelectedAssetFilter] = useState("")
-  const [ createLoading, setCreateLoading] = useState(false)
+  const [createLoading, setCreateLoading] = useState(false)
   // Form states
   const [assignForm, setAssignForm] = useState({
     assignedTo: "",
@@ -1132,55 +1132,71 @@ const AssignmentPage = () => {
 
       {/* View Assignment Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Assignment Details</DialogTitle>
             <DialogDescription>View assignment information and mark items as expended</DialogDescription>
           </DialogHeader>
+
           {selectedAssignment && (
-            <div className="space-y-4">
+            <div className="space-y-6">
+              {/* Basic Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Assigned To</Label>
+                  <Label className="text-sm font-medium text-muted-foreground">Assigned To</Label>
                   <p className="font-medium">{selectedAssignment.assignedTo}</p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Assignment Date</Label>
+                  <Label className="text-sm font-medium text-muted-foreground">Assignment Date</Label>
                   <p className="font-medium">{format(new Date(selectedAssignment.assignDate), "PPP")}</p>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <div className="mt-1">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground">Base</Label>
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="font-medium">{selectedAssignment.base?.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedAssignment.base?.district}, {selectedAssignment.base?.state}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground">Status</Label>
                   <Badge variant={selectedAssignment.isExpended ? "secondary" : "default"}>
                     {selectedAssignment.isExpended ? "Expended" : "Active"}
                   </Badge>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Base</Label>
-                <div className="mt-1">
-                  <Badge variant="default">
-                    {selectedAssignment.base.name}
-                  </Badge>
+              {/* Remarks */}
+              {selectedAssignment.remarks && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground">Remarks</Label>
+                  <p className="p-3 bg-muted rounded-lg">{selectedAssignment.remarks}</p>
                 </div>
-              </div>
+              )}
 
+              {/* Assigned Items */}
               <div className="space-y-2">
-                <Label>Assigned Items</Label>
-                <div className="space-y-2 mt-2">
+                <Label className="text-sm font-medium text-muted-foreground">Assigned Items</Label>
+                <div className="space-y-2">
                   {selectedAssignment.items.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-2">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                    >
+                      <div className="flex items-center space-x-3">
                         <Checkbox
                           checked={selectedItems.some((si) => si.asset._id === item.asset._id)}
                           onCheckedChange={(checked) => {
                             if (checked) {
-                              setSelectedItems((prev) => [...prev, item])
+                              setSelectedItems((prev) => [...prev, item]);
                             } else {
-                              setSelectedItems((prev) => prev.filter((si) => si.asset._id !== item.asset._id))
+                              setSelectedItems((prev) =>
+                                prev.filter((si) => si.asset._id !== item.asset._id)
+                              );
                             }
                           }}
                           disabled={selectedAssignment.isExpended || item.isExpended}
@@ -1195,7 +1211,7 @@ const AssignmentPage = () => {
                           {item.quantity} {item.asset.unit}
                         </p>
                         {item.isExpended && (
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="secondary" className="text-xs mt-1">
                             Expended
                           </Badge>
                         )}
@@ -1205,16 +1221,13 @@ const AssignmentPage = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Remarks</Label>
-                <p className="text-sm text-muted-foreground mt-1">{selectedAssignment.remarks}</p>
-              </div>
-
+              {/* Expend Form */}
               {!selectedAssignment.isExpended && selectedItems.length > 0 && (
                 <div className="space-y-4 border-t pt-4">
-                  <h4 className="font-medium">Mark Selected Items as Expended</h4>
+                  <h4 className="font-medium text-lg">Mark Selected Items as Expended</h4>
+
                   <div className="space-y-2">
-                    <Label htmlFor="expendedBy">Expended By</Label>
+                    <Label htmlFor="expendedBy" className="text-sm text-muted-foreground">Expended By</Label>
                     <Input
                       id="expendedBy"
                       value={expendForm.expendedBy}
@@ -1222,8 +1235,9 @@ const AssignmentPage = () => {
                       placeholder="Enter personnel name"
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="expendRemarks">Expenditure Remarks</Label>
+                    <Label htmlFor="expendRemarks" className="text-sm text-muted-foreground">Expenditure Remarks</Label>
                     <Textarea
                       id="expendRemarks"
                       value={expendForm.remarks}
@@ -1231,8 +1245,9 @@ const AssignmentPage = () => {
                       placeholder="Enter expenditure remarks"
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label>Expenditure Date</Label>
+                    <Label className="text-sm text-muted-foreground">Expenditure Date</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full justify-start">
@@ -1244,7 +1259,9 @@ const AssignmentPage = () => {
                         <Calendar
                           mode="single"
                           selected={expendForm.expendDate}
-                          onSelect={(date) => setExpendForm((prev) => ({ ...prev, expendDate: date }))}
+                          onSelect={(date) =>
+                            setExpendForm((prev) => ({ ...prev, expendDate: date }))
+                          }
                           initialFocus
                         />
                       </PopoverContent>
@@ -1254,6 +1271,7 @@ const AssignmentPage = () => {
               )}
             </div>
           )}
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
               Close
@@ -1267,6 +1285,7 @@ const AssignmentPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
 
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
