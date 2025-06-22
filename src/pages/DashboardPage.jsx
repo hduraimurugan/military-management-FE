@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { useAuth } from "../context/AuthContext"
 import { useNavigate } from "react-router-dom"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle ,CardFooter} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Calendar } from "@/components/ui/calendar"
@@ -54,12 +54,30 @@ const DashboardPage = () => {
     dateFrom: null,
     dateTo: null,
     category: "All categories",
-    base_id: isAdmin && bases.length > 0 ? bases[0]._id : "",
+    base_id: "",
   })
+
+  useEffect(() => {
+    if (isAdmin && bases.length > 0) {
+      const savedBaseId = localStorage.getItem("selected_base_id")
+      const defaultBaseId = savedBaseId || bases[0]._id
+      if (!filters.base_id) {
+        setFilters((prev) => ({ ...prev, base_id: defaultBaseId }))
+      }
+    }
+  }, [isAdmin, bases])
+
+  useEffect(() => {
+    if (filters.base_id) {
+      localStorage.setItem("selected_base_id", filters.base_id)
+    }
+  }, [filters.base_id])
+
 
   // Fetch dashboard data
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (isAdmin && !filters.base_id) return
       try {
         setLoading(true)
 
@@ -68,8 +86,9 @@ const DashboardPage = () => {
           dateFrom: filters.dateFrom ? format(filters.dateFrom, "yyyy-MM-dd") : undefined,
           dateTo: filters.dateTo ? format(filters.dateTo, "yyyy-MM-dd") : undefined,
           category: filters.category !== "All categories" ? filters.category : undefined,
-          base_id: filters.base_id,
+          ...(isAdmin ? { base_id: filters.base_id } : {}),
         }
+
 
         const queryParams = Object.fromEntries(Object.entries(params).filter(([_, value]) => value !== undefined))
 
@@ -85,6 +104,7 @@ const DashboardPage = () => {
 
     fetchDashboardData()
   }, [filters])
+
 
   // Calculate aggregate metrics
   const metrics = useMemo(() => {
@@ -158,29 +178,29 @@ const DashboardPage = () => {
   }
 
   if (error) {
-  return (
-    <div className="flex items-start justify-center min-h-screen mt-10">
-      <Card className="w-full max-w-md shadow-xl border-destructive/40">
-        <CardHeader className="text-center">
-          <CardTitle className="text-destructive text-2xl">Something Went Wrong</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground text-center">{error}</p>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <Button
-            variant="outline"
-            className="gap-2 hover:bg-primary/10"
-            onClick={() => window.location.reload()}
-          >
-            <RefreshCw className="w-4 h-4 animate-spin-on-hover" />
-            Refresh Page
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
-  );
-}
+    return (
+      <div className="flex items-start justify-center min-h-screen mt-10">
+        <Card className="w-full max-w-md shadow-xl border-destructive/40">
+          <CardHeader className="text-center">
+            <CardTitle className="text-destructive text-2xl">Something Went Wrong</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground text-center">{error}</p>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <Button
+              variant="outline"
+              className="gap-2 hover:bg-primary/10"
+              onClick={() => window.location.reload()}
+            >
+              <RefreshCw className="w-4 h-4 animate-spin-on-hover" />
+              Refresh Page
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -314,7 +334,7 @@ const DashboardPage = () => {
                 </div>
               </PopoverContent>
             </Popover>
-          )}          
+          )}
         </div>
       </Card>
 
@@ -428,7 +448,7 @@ const DashboardPage = () => {
               </PopoverContent>
             </Popover>
           )}
-          
+
         </div>
       </Card>
 
