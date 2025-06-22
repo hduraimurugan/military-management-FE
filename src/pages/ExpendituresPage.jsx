@@ -75,6 +75,7 @@ const ExpendituresPage = () => {
   const [showViewModal, setShowViewModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedExpenditure, setSelectedExpenditure] = useState(null)
+  const [createLoading, setCreateLoading] = useState(false)
 
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("")
@@ -187,6 +188,7 @@ const ExpendituresPage = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault()
+    setCreateLoading(true)
     try {
       const createData = {
         ...formData,
@@ -200,6 +202,8 @@ const ExpendituresPage = () => {
     } catch (err) {
       // setError(err.message)
       toast.error(err.message)
+    } finally {
+      setCreateLoading(false)
     }
   }
 
@@ -1154,7 +1158,7 @@ const ExpendituresPage = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit">Create Expenditure</Button>
+              <Button type="submit" disabled={createLoading}>Create Expenditure</Button>
             </DialogFooter>
           </form>
         </DialogContent>

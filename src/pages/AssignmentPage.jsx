@@ -67,7 +67,7 @@ const AssignmentPage = () => {
   const [selectedItems, setSelectedItems] = useState([])
 
   const [selectedAssetFilter, setSelectedAssetFilter] = useState("")
-
+  const [ createLoading, setCreateLoading] = useState(false)
   // Form states
   const [assignForm, setAssignForm] = useState({
     assignedTo: "",
@@ -173,6 +173,7 @@ const AssignmentPage = () => {
 
   // Handle assignment creation
   const handleCreateAssignment = async () => {
+    setCreateLoading(true)
     try {
       const assignmentData = {
         ...assignForm,
@@ -193,6 +194,9 @@ const AssignmentPage = () => {
     } catch (err) {
       console.error("Failed to create assignment:", err)
       toast.error(err.message)
+    } finally {
+      setCreateLoading(false)
+
     }
   }
 
@@ -332,6 +336,7 @@ const AssignmentPage = () => {
           </Button>
 
           {(isAdmin || isCommander) && (
+            // Create Assignment
             <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
               <DialogTrigger asChild>
                 <Button>
@@ -461,7 +466,7 @@ const AssignmentPage = () => {
                   <Button variant="outline" onClick={() => setIsAssignModalOpen(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleCreateAssignment}>Create Assignment</Button>
+                  <Button onClick={handleCreateAssignment} disabled={createLoading}>Create Assignment</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>

@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import {
   Plus,
@@ -81,7 +79,7 @@ const TransferPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedTransfer, setSelectedTransfer] = useState(null)
   const [activeTab, setActiveTab] = useState("out")
-
+  const [ createLoading , setCreateLoading] = useState(false)
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedAssetFilter, setSelectedAssetFilter] = useState("")
@@ -186,6 +184,7 @@ const TransferPage = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault()
+    setCreateLoading(true)
     try {
       const createData = {
         ...formData,
@@ -198,6 +197,8 @@ const TransferPage = () => {
       fetchTransfers()
     } catch (err) {
       toast.error(err.message)
+    } finally{
+       setCreateLoading(false)
     }
   }
 
@@ -1973,11 +1974,11 @@ const TransferPage = () => {
                 onClick={() => {
                   setShowCreateModal(false)
                   resetForm()
-                }}
+                }}           
               >
                 Cancel
               </Button>
-              <Button type="submit">Create Transfer</Button>
+              <Button type="submit" disabled={createLoading}>Create Transfer</Button>
             </DialogFooter>
           </form>
         </DialogContent>
