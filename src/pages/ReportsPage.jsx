@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -34,9 +32,11 @@ import { cn } from "@/lib/utils"
 import { movementAPI } from "../services/api"
 import { useAssetBase } from "../context/AssetBaseContext"
 import InventorySkeleton from "../components/InventorySkeleton"
+import { useAuth } from "../context/AuthContext"
 
 const ReportsPage = () => {
-  const { assets } = useAssetBase()
+  const { user, isAdmin, isLogisticsOfficer, isCommander } = useAuth()
+  const { assets, bases } = useAssetBase()
   const [searchTerm, setSearchTerm] = useState("")
   const [movementData, setMovementData] = useState([])
   const [loading, setLoading] = useState(true)
@@ -426,6 +426,50 @@ const ReportsPage = () => {
 
           </Popover>
 
+          {/* Base Selector (Admin Only) */}
+          {isAdmin && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <Building2 className="h-3 w-3 mr-2" />
+                  {filters.baseId === "All bases" || !filters.baseId
+                    ? "Base"
+                    : bases.find((b) => b._id === filters.baseId)?.name}
+                  <ChevronDown className="h-3 w-3 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start">
+                <div className="space-y-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      (filters.baseId === "All bases" || !filters.baseId) && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setFilters((prev) => ({ ...prev, baseId: undefined }))}
+                  >
+                    All bases
+                  </Button>
+                  {bases.map((base) => (
+                    <Button
+                      key={base._id}
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        filters.baseId === base._id && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setFilters((prev) => ({ ...prev, baseId: base._id }))}
+                    >
+                      {base.name}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
           {/* Action Type */}
           <Popover>
             <PopoverTrigger asChild>
@@ -615,6 +659,50 @@ const ReportsPage = () => {
             </PopoverContent>
 
           </Popover>
+
+          {/* Base Selector (Admin Only) */}
+          {isAdmin && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9">
+                  <Building2 className="h-3 w-3 mr-2" />
+                  {filters.baseId === "All bases" || !filters.baseId
+                    ? "Base"
+                    : bases.find((b) => b._id === filters.baseId)?.name}
+                  <ChevronDown className="h-3 w-3 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start">
+                <div className="space-y-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start h-8 text-sm",
+                      (filters.baseId === "All bases" || !filters.baseId) && "bg-primary/10 text-primary",
+                    )}
+                    onClick={() => setFilters((prev) => ({ ...prev, baseId: undefined }))}
+                  >
+                    All bases
+                  </Button>
+                  {bases.map((base) => (
+                    <Button
+                      key={base._id}
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "w-full justify-start h-8 text-sm",
+                        filters.baseId === base._id && "bg-primary/10 text-primary",
+                      )}
+                      onClick={() => setFilters((prev) => ({ ...prev, baseId: base._id }))}
+                    >
+                      {base.name}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
 
           {/* Action Type */}
           <Popover>

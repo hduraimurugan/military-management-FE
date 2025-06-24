@@ -35,7 +35,7 @@ export const Sidebar = ({ pageTitle }) => {
     { name: 'Transfered Assets', path: '/transfer', icon: <ArrowRightLeft className="h-5 w-5" />, roles: ['admin', 'logistics_officer'] },
     { name: 'Assigned Assets', path: '/assignment', icon: <MdOutlineAssignmentTurnedIn className="h-5 w-5" />, roles: ['admin', 'base_commander'] },
     { name: 'Expended Assets', path: '/expend', icon: <LucideNotebookText className="h-5 w-5" />, roles: ['admin', 'base_commander'] },
-    { name: 'Movement Logs', path: '/reports', icon: <LucideLogs className="h-5 w-5" />, roles: ['admin'] }
+    { name: 'Movement Logs', path: '/reports', icon: <LucideLogs className="h-5 w-5" />, roles: ['admin', 'base_commander', 'logistics_officer'] }
   ]
 
   const accountItems = [

@@ -588,7 +588,7 @@ const AssignmentPage = () => {
               </PopoverTrigger>
               <PopoverContent className="w-48 p-2" align="start">
                 <div className="space-y-1">
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="sm"
                     className={cn(
@@ -598,7 +598,7 @@ const AssignmentPage = () => {
                     onClick={() => setFilters((prev) => ({ ...prev, base_id: "All bases" }))}
                   >
                     All bases
-                  </Button>
+                  </Button> */}
                   {bases.map((base) => (
                     <Button
                       key={base._id}
@@ -853,7 +853,7 @@ const AssignmentPage = () => {
               </PopoverTrigger>
               <PopoverContent className="w-48 p-2" align="start">
                 <div className="space-y-1">
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="sm"
                     className={cn(
@@ -863,7 +863,7 @@ const AssignmentPage = () => {
                     onClick={() => setFilters((prev) => ({ ...prev, base_id: "All bases" }))}
                   >
                     All bases
-                  </Button>
+                  </Button> */}
                   {bases.map((base) => (
                     <Button
                       key={base._id}
