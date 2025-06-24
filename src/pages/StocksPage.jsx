@@ -83,7 +83,7 @@ const StocksPage = () => {
 
         // Remove undefined params
         const queryParams = Object.fromEntries(Object.entries(params).filter(([_, value]) => value !== undefined))
-
+        console.log("Calling Stocks API with:", queryParams)
         const data = await inventoryAPI.getMyStock(queryParams)
 
         setInventoryData(data.stocks)
@@ -99,8 +99,14 @@ const StocksPage = () => {
   }, [filters, sortConfig]) // Re-fetch when filters or sort change
 
   // Update your useEffect to use debouncedSearchTerm
+  // useEffect(() => {
+  //   setFilters((prev) => ({ ...prev, asset: debouncedSearchTerm }))
+  // }, [debouncedSearchTerm])
+
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, asset: debouncedSearchTerm }))
+    if (debouncedSearchTerm !== filters.asset) {
+      setFilters((prev) => ({ ...prev, asset: debouncedSearchTerm }))
+    }
   }, [debouncedSearchTerm])
 
   const handleSort = (key) => {

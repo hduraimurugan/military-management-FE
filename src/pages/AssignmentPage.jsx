@@ -114,6 +114,7 @@ const AssignmentPage = () => {
       }
 
       const queryParams = Object.fromEntries(Object.entries(params).filter(([_, value]) => value !== undefined))
+      console.log("Calling Assign API with:", queryParams)
       const data = await assignmentAPI.getAll(queryParams)
 
       setAssignmentData(data.assignments || [])
@@ -146,9 +147,15 @@ const AssignmentPage = () => {
     }
   }, [isAssignModalOpen])
 
+  // useEffect(() => {
+  //   setFilters((prev) => ({ ...prev, assignedTo: debouncedSearchTerm }))
+  // }, [debouncedSearchTerm])
+
   useEffect(() => {
+  if (debouncedSearchTerm !== filters.assignedTo) {
     setFilters((prev) => ({ ...prev, assignedTo: debouncedSearchTerm }))
-  }, [debouncedSearchTerm])
+  }
+}, [debouncedSearchTerm])
 
   const handleSort = (key) => {
     let direction = "asc"
