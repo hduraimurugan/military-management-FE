@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Eye, EyeOff } from "lucide-react"
 
 const roles = [
-  { value: "admin", label: "Admin" },
+  // { value: "admin", label: "Admin" },
   { value: "base_commander", label: "Base Commander" },
   { value: "logistics_officer", label: "Logistics Officer" },
   // { value: "user", label: "User" },
@@ -122,32 +122,33 @@ export function UserFormModal({ isOpen, onClose, onSave, user, mode, bases }) {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password {mode === "edit" && "(Leave empty to keep current)"}</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => handleChange("password", e.target.value)}
-                  placeholder={mode === "create" ? "Enter password" : "Enter new password"}
-                  required={mode === "create"}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
+            {formData.role?.toLowerCase() === "admin" ? null : (
+              <div className="space-y-2">
+                <Label htmlFor="password">Password {mode === "edit" && "(Leave empty to keep current)"}</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) => handleChange("password", e.target.value)}
+                    placeholder={mode === "create" ? "Enter password" : "Enter new password"}
+                    required={mode === "create"}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>)}
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
-              <Select value={formData.role} onValueChange={(value) => handleChange("role", value)}>
+              <Select value={formData.role || 'Admin'} onValueChange={(value) => handleChange("role", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select user role" />
                 </SelectTrigger>
@@ -159,7 +160,28 @@ export function UserFormModal({ isOpen, onClose, onSave, user, mode, bases }) {
                   ))}
                 </SelectContent>
               </Select>
+            </div> */}
+
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              {formData.role?.toLowerCase() === "admin" ? (
+                <p className="border rounded-md px-3 py-2 bg-muted text-muted-foreground">Admin</p>
+              ) : (
+                <Select value={formData.role} onValueChange={(value) => handleChange("role", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select user role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem key={role.value} value={role.value}>
+                        {role.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
+
 
             {formData.role !== "admin" &&
               <div className="space-y-2">

@@ -90,7 +90,7 @@ export const Sidebar = ({ pageTitle }) => {
         </div>
 
         {/* Scrollable Section */}
-        <ScrollArea className="flex-1 px-3 pt-3 pb-6 overflow-y-auto">
+        <ScrollArea className="flex-1 px-3 pt-3 pb-3 overflow-y-auto">
 
           {/* Main Navigation */}
           <div>

@@ -117,7 +117,7 @@ export function UsersTable({ users, bases, onEdit, onDelete, loading }) {
                   <Button variant="ghost" size="sm" onClick={() => onEdit(user)} className="h-8 w-8 p-0">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  {user.role !== "admin" &&
+                  {/* {user.role !== "admin" &&
                     <Button
                       variant="ghost"
                       size="sm"
@@ -126,7 +126,7 @@ export function UsersTable({ users, bases, onEdit, onDelete, loading }) {
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  }
+                  } */}
                 </div>
               </TableCell>
             </TableRow>
