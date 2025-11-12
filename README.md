@@ -1,5 +1,7 @@
 # Military Asset Management - Technical Documentation
 
+https://github.com/user-attachments/assets/43cb0be3-2270-42b5-9523-b712daa5fcfb
+
 ## 1. Project Overview
 
 **Description:**
